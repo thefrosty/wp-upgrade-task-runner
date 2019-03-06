@@ -168,10 +168,12 @@ class UpgradeTest extends WpUnitTestCase
 
         $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
         $settingsPage->setAccessible(true);
+        $settingsPageValue = $settingsPage->getValue($this->upgrade) ?? $this->getSettingsPage();
+
 
         $enqueueScripts = $this->getReflection($this->upgrade)->getMethod('enqueueScripts');
         $enqueueScripts->setAccessible(true);
-        $enqueueScripts->invoke($this->upgrade, $settingsPage->getValue($this->upgrade));
+        $enqueueScripts->invoke($this->upgrade, $settingsPageValue ?? 'dashboard_page_upgrade-task-runner');
 
         $this->assertTrue(
             \wp_script_is('upgrade-task-runner-dialog'),
