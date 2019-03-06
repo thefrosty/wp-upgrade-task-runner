@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 use TheFrosty\WpUpgradeTaskRunner\Upgrade;
-use TheFrosty\WpUpgradeTaskRunner\UpgradesListTable;
 
 /**
  * Upgrade object.
@@ -11,16 +10,24 @@ if (!($this instanceof Upgrade)) {
     wp_die(sprintf('Please don\'t load this file outside of <code>%s.</code>', esc_attr(Upgrade::class)));
 }
 
-$property = (new ReflectionObject($this))->getProperty('list_table');
-$property->setAccessible(true);
+try {
+    $property = (new ReflectionObject($this))->getProperty('list_table');
+    $property->setAccessible(true);
+} catch (ReflectionException $exception) {
+    wp_die($exception->getMessage());
+}
+
 /**
  * UpgradesListTable object.
- * @var UpgradesListTable $list_table
+ * @var TheFrosty\WpUpgradeTaskRunner\UpgradesListTable $list_table
  */
 $list_table = $property->getValue($this);
 ?>
 <div class="wrap">
-    <h2><?php esc_html_e('Data Migration &amp; Upgrade Tasks', 'wp-upgrade-task-runner'); ?></h2>
+    <h2>
+        <?php esc_html_e('Data Migration &amp; Upgrade Tasks', 'wp-upgrade-task-runner'); ?>
+        &nbsp;<small style="font-size: 50%">v. <?php echo \TheFrosty\WpUpgradeTaskRunner\VERSION; ?></small>
+    </h2>
     <p class="description">
         <?php esc_html_e('The registered tasks are created by developers to run data migrations or upgrades
          on the database when code might require a modification. Each task can only be run once. Please note, 
@@ -30,7 +37,7 @@ $list_table = $property->getValue($this);
     <?php
     /**
      * Settings action hook.
-     * @param UpgradesListTable $list_table UpgradesListTable object.
+     * @param TheFrosty\WpUpgradeTaskRunner\UpgradesListTable $list_table UpgradesListTable object.
      */
     do_action(Upgrade::UPGRADES_LIST_TABLE_ACTION, $list_table);
     $list_table->prepare_items();
