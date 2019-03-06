@@ -15,15 +15,13 @@ use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModelFactory;
  */
 class UpgradesListTable extends \WP_List_Table
 {
-    const COLUMN_DATE = UpgradeModel::FIELD_DATE;
-    const COLUMN_TITLE = UpgradeModel::FIELD_TITLE;
-    const COLUMN_DESCRIPTION = UpgradeModel::FIELD_DESCRIPTION;
-    const COLUMN_EXECUTED = 'executed';
-    const DESCRIPTION_CONCATENATION_LENGTH = 220;
-    const NONCE_KEY = 'task_runner_migration_upgrades_nonce_%s';
-    const NONCE_NAME = '_task_runner_execute_nonce';
-    const OPTION_NAME = 'wp_upgrade_task_runner';
-    const PER_PAGE = 30;
+    private const COLUMN_DATE = UpgradeModel::FIELD_DATE;
+    private const COLUMN_TITLE = UpgradeModel::FIELD_TITLE;
+    private const COLUMN_DESCRIPTION = UpgradeModel::FIELD_DESCRIPTION;
+    private const COLUMN_EXECUTED = 'executed';
+    private const DESCRIPTION_CONCATENATION_LENGTH = 220;
+    private const NONCE_KEY = 'task_runner_migration_upgrades_nonce_%s';
+    private const PER_PAGE = 30;
 
     /**
      * Array of data registered to be updated.
@@ -70,10 +68,8 @@ class UpgradesListTable extends \WP_List_Table
      */
     public function registerUpgrades(array $upgrades)
     {
-        \array_walk($upgrades, function (UpgradeModel $upgrade = null) {
-            if ($upgrade instanceof UpgradeModel) {
-                $this->upgrade_models[] = $upgrade;
-            }
+        \array_walk($upgrades, function (UpgradeModel $upgrade) {
+            $this->upgrade_models[] = $upgrade;
         });
     }
 
@@ -110,7 +106,7 @@ class UpgradesListTable extends \WP_List_Table
      */
     public function getUpgradeModels(): array
     {
-        $upgrade_data = !empty($upgrade_data) ? $upgrade_data : $this->upgrade_models;
+        $upgrade_data = $this->upgrade_models;
         \usort($upgrade_data, [$this, 'usortReorder']);
 
         return $upgrade_data;
@@ -125,7 +121,7 @@ class UpgradesListTable extends \WP_List_Table
         static $options;
 
         if (empty($options)) {
-            $options = \get_option(self::OPTION_NAME, []);
+            $options = \get_option(Upgrade::OPTION_NAME, []);
         }
 
         return $options;
@@ -194,7 +190,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
                         ''
                     ),
                     $this->getNonceKeyValue($item->getTitle()),
-                    self::NONCE_NAME
+                    Upgrade::NONCE_NAME
                 ),
                 Upgrade::AJAX_ACTION,
                 \esc_attr($item->getTitle()),
@@ -216,8 +212,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
                     \sprintf(
                         '<time datetime="%s">%s</time>',
                         $datetime->format(\DateTime::ISO8601),
-                        $datetime->setTimeZone(new \DateTimeZone('America/Los_Angeles'))
-                            ->format('l, M d, Y h:i:s T')
+                        $datetime->setTimeZone(new \DateTimeZone(\get_option('timezone_string')))->format('l, M d, Y h:i:s T')
                     )
                 ),
             ];
