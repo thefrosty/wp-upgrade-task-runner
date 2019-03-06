@@ -2,11 +2,11 @@
 
 namespace TheFrosty\WpUpgradeTaskRunner;
 
+use Pimple\Container;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
 use TheFrosty\WpUpgradeTaskRunner\Tasks\TaskLoader;
 use TheFrosty\WpUtilities\Plugin\AbstractHookProvider;
-use TheFrosty\WpUtilities\Plugin\Container;
 use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestInterface;
 use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestTrait;
 
@@ -21,6 +21,14 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     public const AJAX_ACTION = 'wp_upgrade_schedule_task_event';
     public const UPGRADES_LIST_TABLE_ACTION = 'wp_upgrade_task_runner_screen';
     public const MENU_SLUG = 'upgrade-task-runner';
+    public const NONCE_NAME = '_task_runner_execute_nonce';
+    public const OPTION_NAME = 'wp_upgrade_task_runner';
+
+    /**
+     * Container object.
+     * @var Container $container
+     */
+    private $container;
 
     /**
      * UpgradesListTable object.
@@ -46,7 +54,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
      */
     public function __construct(Container $container)
     {
-        $this->list_table = $container[ServiceProvider::UPGRADES_LIST_TABLE];
+        $this->container = $container;
         $this->task_loader = $container[ServiceProvider::TASK_LOADER];
     }
 
@@ -66,6 +74,10 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
      */
     protected function addDashboardPage()
     {
+        if (!\class_exists('WP_List_Table')) {
+            require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
+        }
+        $this->list_table = new UpgradesListTable($this->container);
         $this->settings_page = \add_dashboard_page(
             \esc_html__('Data Migration &amp; Upgrade Tasks', 'wp-upgrade-task-runner'),
             \sprintf(\__('Migration Tasks %s', 'wp-upgrade-task-runner'), $this->getUpgradeCountHtml()),
@@ -135,7 +147,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             'upgrade-task-runner',
             'wpUpgradeTaskRunner',
             [
-                'nonceKeyName' => UpgradesListTable::NONCE_NAME,
+                'nonceKeyName' => self::NONCE_NAME,
             ]
         );
     }
@@ -149,14 +161,14 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     protected function maybeExecute()
     {
         $query = $this->getRequest()->query;
-        if ((!$query->has(UpgradesListTable::NONCE_NAME) || !$query->has('item')) &&
-            ($query->get(UpgradesListTable::NONCE_NAME) !== null || $query->get('item') !== null)
+        if ((!$query->has(self::NONCE_NAME) || !$query->has('item')) &&
+            ($query->get(self::NONCE_NAME) !== null || $query->get('item') !== null)
         ) {
             return;
         }
 
         if (!\wp_verify_nonce(
-            $query->get(UpgradesListTable::NONCE_NAME),
+            $query->get(self::NONCE_NAME),
             $this->list_table->getNonceKeyValue(\rawurldecode($query->get('item', '')))
         )) {
             return;
@@ -164,7 +176,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
 
         $this->triggerTaskRunnerScheduleEvent($query);
 
-        \wp_safe_redirect(\remove_query_arg([UpgradesListTable::NONCE_NAME]));
+        \wp_safe_redirect(\remove_query_arg([self::NONCE_NAME]));
         exit;
     }
 
@@ -183,8 +195,8 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             \wp_send_json_error(['error' => $exception->getMessage()]);
         }
         $request = $this->getRequest()->request;
-        if ((!$request->has(UpgradesListTable::NONCE_NAME) || !$request->has('item')) &&
-            ($request->get(UpgradesListTable::NONCE_NAME) !== null || $request->get('item') !== null)
+        if ((!$request->has(self::NONCE_NAME) || !$request->has('item')) &&
+            ($request->get(self::NONCE_NAME) !== null || $request->get('item') !== null)
         ) {
             \wp_send_json_error(['error' => 'bad request']);
         }
