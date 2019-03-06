@@ -3,7 +3,7 @@
 namespace TheFrosty\WpUpgradeTaskRunner\Api;
 
 use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
-use TheFrosty\WpUpgradeTaskRunner\UpgradesListTable;
+use TheFrosty\WpUpgradeTaskRunner\Upgrade;
 
 /**
  * Class TaskRunner
@@ -30,14 +30,12 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
     public function complete(UpgradeModel $model): bool
     {
         $this->args = [];
-        $options = \get_option(UpgradesListTable::OPTION_NAME, []);
+        $options = \get_option(Upgrade::OPTION_NAME, []);
         if (empty($options[\sanitize_title($model->getTitle())])) {
-            $date = (new \DateTime('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC850);
-            $options[\sanitize_title($model->getTitle())] = $date;
-            unset($date);
+            $options[\sanitize_title($model->getTitle())] = $this->getDate();
         }
 
-        return \update_option(UpgradesListTable::OPTION_NAME, $options, true);
+        return \update_option(Upgrade::OPTION_NAME, $options, true);
     }
 
     /**
@@ -82,5 +80,18 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
             'no_found_rows' => true,
         ];
         return new \WP_Query(\wp_parse_args($args, $defaults));
+    }
+
+    /**
+     * Get a date formatted string.
+     * @return string
+     */
+    private function getDate(): string
+    {
+        try {
+            return (new \DateTime('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC850);
+        } catch (\Exception $exception) {
+            return (date_create('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC850);
+        }
     }
 }
