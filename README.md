@@ -28,7 +28,7 @@ compatibility is entirely coincidental.
 To install this library, use Composer:
 
 ```
-composer require thefrosty/wp-upgrade-task-runner:~1.0
+composer require thefrosty/wp-upgrade-task-runner:~1.1
 ```
 
 ## Getting Started
@@ -41,7 +41,7 @@ class. See the `ExampleMigrationTask` example class.
 ```php
 use TheFrosty\WpUpgradeTaskRunner\Tasks\TaskLoader;
 
-\add_filter(TaskLoader::REGISTER_TASKS_TAG, function(array $tasks): array {
+\add_filter(TaskLoader::REGISTER_TASKS_TAG, static function(array $tasks): array {
     $tasks[] = new \Project\SomeCustomTask();
     return $tasks;
 });
