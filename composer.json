@@ -38,7 +38,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "TheFrosty\\WpUpgradeTaskRunner\\PhpUnit\\": "tests/src/unit"
+      "TheFrosty\\WpUpgradeTaskRunner\\PhpUnit\\": "tests/unit"
     }
   },
   "scripts": {
