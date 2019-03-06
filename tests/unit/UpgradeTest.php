@@ -29,18 +29,14 @@ class UpgradeTest extends WpUnitTestCase
 
         $this->upgrade = new Upgrade($this->container);
 
-        try {
-            $this->admin_user_id = $this->factory()->user->create([
-                'role' => 'administrator',
-            ]);
-            $this->author_user_id = $this->factory()->user->create([
-                'role' => 'author',
-            ]);
-            $this->assertTrue(is_int($this->admin_user_id), 'Admin user not created');
-            $this->assertTrue(is_int($this->author_user_id), 'Author user not created');
-        } catch (\Exception $exception) {
-            $this->expectException(\get_class($exception));
-        }
+        $this->admin_user_id = $this->factory()->user->create([
+            'role' => 'administrator',
+        ]);
+        $this->author_user_id = $this->factory()->user->create([
+            'role' => 'author',
+        ]);
+        $this->assertTrue(is_int($this->admin_user_id), 'Admin user not created');
+        $this->assertTrue(is_int($this->author_user_id), 'Author user not created');
     }
 
     /**
