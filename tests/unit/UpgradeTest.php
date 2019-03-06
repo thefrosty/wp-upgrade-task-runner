@@ -89,6 +89,7 @@ class UpgradeTest extends WpUnitTestCase
     public function testAddDashboardPage()
     {
         \wp_set_current_user($this->admin_user_id);
+        $this->upgrade->addHooks();
         $this->assertTrue(\property_exists($this->upgrade, 'settings_page'));
         $this->assertTrue(\method_exists($this->upgrade, 'addDashboardPage'));
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
@@ -105,6 +106,7 @@ class UpgradeTest extends WpUnitTestCase
     public function testAddDashboardPageWithAdmin()
     {
         \wp_set_current_user($this->admin_user_id);
+        $this->upgrade->addHooks();
         $this->assertTrue(\property_exists($this->upgrade, 'settings_page'));
         $this->assertTrue(\method_exists($this->upgrade, 'addDashboardPage'));
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
@@ -125,6 +127,7 @@ class UpgradeTest extends WpUnitTestCase
     public function testAddDashboardPageWithNonAdmin()
     {
         \wp_set_current_user($this->author_user_id);
+        $this->upgrade->addHooks();
         $this->assertTrue(\property_exists($this->upgrade, 'settings_page'));
         $this->assertTrue(\method_exists($this->upgrade, 'addDashboardPage'));
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
@@ -144,6 +147,7 @@ class UpgradeTest extends WpUnitTestCase
      */
     public function testEnqueueScripts()
     {
+        $this->upgrade->addHooks();
         $this->assertTrue(\property_exists($this->upgrade, 'settings_page'));
         $this->assertTrue(\method_exists($this->upgrade, 'addDashboardPage'));
         $this->assertTrue(\method_exists($this->upgrade, 'enqueueScripts'));
