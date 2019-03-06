@@ -27,7 +27,12 @@ class UpgradeTest extends WpUnitTestCase
     {
         parent::setUp();
 
+        $screens = [
+            'index.php?page=upgrade-task-runner' => ['base' => 'dashboard', 'id' => 'dashboard'],
+        ];
         $this->upgrade = new Upgrade($this->container);
+        $GLOBALS['hook_suffix'] = $this->getSettingsPage();
+        \set_current_screen( $this->getSettingsPage() );
 
         $this->admin_user_id = $this->factory()->user->create([
             'role' => 'administrator',
@@ -45,7 +50,7 @@ class UpgradeTest extends WpUnitTestCase
     public function tearDown()
     {
         parent::tearDown();
-        unset($this->upgrade);
+        unset($this->upgrade, $GLOBALS['hook_suffix']);
         \wp_delete_user($this->admin_user_id);
         \wp_delete_user($this->author_user_id);
     }
@@ -95,6 +100,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
+        \set_current_screen( $this->getSettingsPage() );
 
         $page_url = menu_page_url($this->upgrade::MENU_SLUG, false);
         $this->assertNotEmpty($page_url, 'No dashboard page found');
@@ -112,6 +118,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
+        \set_current_screen( $this->getSettingsPage() );
 
         $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
         $settingsPage->setAccessible(true);
@@ -133,6 +140,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
+        \set_current_screen( $this->getSettingsPage() );
 
         $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
         $settingsPage->setAccessible(true);
@@ -155,6 +163,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
+        \set_current_screen( $this->getSettingsPage() );
 
         $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
         $settingsPage->setAccessible(true);
@@ -175,5 +184,12 @@ class UpgradeTest extends WpUnitTestCase
             \wp_style_is('upgrade-task-runner'),
             'Upgrade Task Runner CSS not enqueued'
         );
+    }
+
+    private function getSettingsPage()
+    {
+        $settings_page = $this->getReflection($this->upgrade)->getProperty('settings_page');
+        $settings_page->setAccessible(true);
+        return $settings_page->getValue($this->upgrade);
     }
 }
