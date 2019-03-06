@@ -3,6 +3,7 @@
 namespace TheFrosty\WpUpgradeTaskRunner\PhpUnit;
 
 use TheFrosty\WpUpgradeTaskRunner\Upgrade;
+use TheFrosty\WpUtilities\Plugin\PluginInterface;
 
 /**
  * Class UpgradeTest
@@ -32,8 +33,8 @@ class UpgradeTest extends WpUnitTestCase
         ];
         $this->upgrade = new Upgrade($this->container);
         $this->upgrade->setPlugin($this->plugin);
-        $GLOBALS['hook_suffix'] = $this->getSettingsPage();
-        \set_current_screen($this->getSettingsPage());
+        $GLOBALS['hook_suffix'] = $this->getSettingsPage($this->upgrade);
+        \set_current_screen($this->getSettingsPage($this->upgrade));
 
         $this->admin_user_id = $this->factory()->user->create([
             'role' => 'administrator',
@@ -41,6 +42,8 @@ class UpgradeTest extends WpUnitTestCase
         $this->author_user_id = $this->factory()->user->create([
             'role' => 'author',
         ]);
+        $this->assertTrue($this->upgrade instanceof Upgrade, 'Upgrade object creation error');
+        $this->assertTrue($this->upgrade->getPlugin() instanceof PluginInterface, 'Upgrade getPlugin object error');
         $this->assertTrue(is_int($this->admin_user_id), 'Admin user not created');
         $this->assertTrue(is_int($this->author_user_id), 'Author user not created');
     }
@@ -102,7 +105,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
-        \set_current_screen($this->getSettingsPage());
+        \set_current_screen($this->getSettingsPage($this->upgrade));
 
         $page_url = menu_page_url($this->upgrade::MENU_SLUG, false);
         $this->assertNotEmpty($page_url, 'No dashboard page found');
@@ -120,7 +123,6 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
-        \set_current_screen($this->getSettingsPage());
 
         $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
         $settingsPage->setAccessible(true);
@@ -142,7 +144,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
-        \set_current_screen($this->getSettingsPage());
+        \set_current_screen($this->getSettingsPage($this->upgrade));
 
         $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
         $settingsPage->setAccessible(true);
@@ -166,35 +168,36 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
-        \set_current_screen($this->getSettingsPage());
-
-        $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
-        $settingsPage->setAccessible(true);
-        $settingsPageValue = $settingsPage->getValue($this->upgrade) ?? $this->getSettingsPage();
-
+        \set_current_screen($this->getSettingsPage($this->upgrade));
 
         $enqueueScripts = $this->getReflection($this->upgrade)->getMethod('enqueueScripts');
         $enqueueScripts->setAccessible(true);
-        $enqueueScripts->invoke($this->upgrade, $settingsPageValue ?? 'dashboard_page_upgrade-task-runner');
+        $enqueueScripts->invoke($this->upgrade, $this->getSettingsPage($this->upgrade));
 
         $this->assertTrue(
-            \wp_script_is('upgrade-task-runner-dialog'),
-            'Upgrade Task Runner Dialog JS not enqueued'
+            \wp_script_is('upgrade-task-runner-dialog', 'registered'),
+            'Upgrade Task Runner Dialog JS not registered'
         );
         $this->assertTrue(
-            \wp_script_is('upgrade-task-runner'),
-            'Upgrade Task Runner JS not enqueued'
+            \wp_script_is('upgrade-task-runner', 'registered'),
+            'Upgrade Task Runner JS not registered'
         );
         $this->assertTrue(
-            \wp_style_is('upgrade-task-runner'),
-            'Upgrade Task Runner CSS not enqueued'
+            \wp_style_is('upgrade-task-runner', 'registered'),
+            'Upgrade Task Runner CSS not registered'
         );
     }
 
-    private function getSettingsPage()
+    private function getSettingsPage(Upgrade $upgrade): string
     {
-        $settings_page = $this->getReflection($this->upgrade)->getProperty('settings_page');
-        $settings_page->setAccessible(true);
-        return $settings_page->getValue($this->upgrade);
+        static $value;
+
+        if (empty($value)) {
+            $settings_page = $this->getReflection($upgrade)->getProperty('settings_page');
+            $settings_page->setAccessible(true);
+            $value = $settings_page->getValue($upgrade) ?? 'dashboard_page_upgrade-task-runner';
+        }
+
+        return \strval($value);
     }
 }
