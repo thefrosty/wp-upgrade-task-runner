@@ -27,11 +27,7 @@ class UpgradeTest extends WpUnitTestCase
     {
         parent::setUp();
 
-        try {
-            $this->upgrade = new Upgrade($this->container);
-        } catch (\Exception $exception) {
-            $this->expectException(\get_class($exception));
-        }
+        $this->upgrade = new Upgrade($this->container);
 
         try {
             $this->admin_user_id = $this->factory()->user->create([
