@@ -36,7 +36,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      * Task Runners.
      * @var TaskRunnerInterface[] $tasks
      */
-    private $tasks;
+    private $tasks = [];
 
     /**
      * UpgradeModelFactory object.
@@ -168,6 +168,10 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      */
     private function getTaskRunnerObjects(): array
     {
+        if ($this->getIterator()->count() === 0) {
+            return [];
+        }
+
         foreach ($this as $task) {
             if ($task instanceof TaskRunnerInterface) {
                 $tasks[] = $task;
