@@ -31,8 +31,9 @@ class UpgradeTest extends WpUnitTestCase
             'index.php?page=upgrade-task-runner' => ['base' => 'dashboard', 'id' => 'dashboard'],
         ];
         $this->upgrade = new Upgrade($this->container);
+        $this->upgrade->setPlugin($this->plugin);
         $GLOBALS['hook_suffix'] = $this->getSettingsPage();
-        \set_current_screen( $this->getSettingsPage() );
+        \set_current_screen($this->getSettingsPage());
 
         $this->admin_user_id = $this->factory()->user->create([
             'role' => 'administrator',
@@ -53,6 +54,7 @@ class UpgradeTest extends WpUnitTestCase
         unset($this->upgrade, $GLOBALS['hook_suffix']);
         \wp_delete_user($this->admin_user_id);
         \wp_delete_user($this->author_user_id);
+        \set_current_screen();
     }
 
     /**
@@ -100,7 +102,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
-        \set_current_screen( $this->getSettingsPage() );
+        \set_current_screen($this->getSettingsPage());
 
         $page_url = menu_page_url($this->upgrade::MENU_SLUG, false);
         $this->assertNotEmpty($page_url, 'No dashboard page found');
@@ -118,7 +120,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
-        \set_current_screen( $this->getSettingsPage() );
+        \set_current_screen($this->getSettingsPage());
 
         $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
         $settingsPage->setAccessible(true);
@@ -140,7 +142,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
-        \set_current_screen( $this->getSettingsPage() );
+        \set_current_screen($this->getSettingsPage());
 
         $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
         $settingsPage->setAccessible(true);
@@ -164,7 +166,7 @@ class UpgradeTest extends WpUnitTestCase
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
         $addDashboardPage->invoke($this->upgrade);
-        \set_current_screen( $this->getSettingsPage() );
+        \set_current_screen($this->getSettingsPage());
 
         $settingsPage = $this->getReflection($this->upgrade)->getProperty('settings_page');
         $settingsPage->setAccessible(true);
