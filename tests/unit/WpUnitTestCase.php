@@ -2,6 +2,7 @@
 
 namespace TheFrosty\WpUpgradeTaskRunner\PhpUnit;
 
+use TheFrosty\WpUpgradeTaskRunner\ServiceProvider;
 use TheFrosty\WpUtilities\Plugin\Container;
 use TheFrosty\WpUtilities\Plugin\Plugin;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
@@ -32,6 +33,7 @@ class WpUnitTestCase extends WP_UnitTestCase
         $this->plugin = PluginFactory::create(self::SLUG);
         /** Container object. @var Container $container */
         $this->container = $this->plugin->getContainer();
+        $this->container->register(new ServiceProvider());
     }
 
     /**
