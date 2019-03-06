@@ -1,15 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace OpenFit\ScheduledPosts\PhpUnit;
+namespace TheFrosty\WpUpgradeTaskRunner\PhpUnit;
 
-use TheFrosty\WpUpgradeTaskRunner\PhpUnit\WpUnitTestCase;
 use TheFrosty\WpUpgradeTaskRunner\Upgrade;
-use TheFrosty\WpUtilities\Plugin\HooksTrait;
 
 /**
- * Class DashSettingsTest
- *
- * @package OpenFit\ScheduledPosts\PhpUnit
+ * Class UpgradeTest
+ * @package TheFrosty\WpUpgradeTaskRunner\PhpUnit
  */
 class UpgradeTest extends WpUnitTestCase
 {
@@ -77,12 +74,21 @@ class UpgradeTest extends WpUnitTestCase
         $constants = $this->getReflection($this->upgrade)->getConstants();
 
         $this->assertNotEmpty($constants, 'No constants found in DashSettings');
-        $this->assertArrayHasKey('AJAX_ACTION', $constants,
-            \sprintf('AJAX_ACTION constant not found in %s', Upgrade::class));
-        $this->assertArrayHasKey('UPGRADES_LIST_TABLE_ACTION', $constants,
-            \sprintf('UPGRADES_LIST_TABLE_ACTION constant not found in %s', Upgrade::class));
-        $this->assertArrayHasKey('MENU_SLUG', $constants,
-            \sprintf('MENU_SLUG constant not found in %s', Upgrade::class));
+        $this->assertArrayHasKey(
+            'AJAX_ACTION',
+            $constants,
+            \sprintf('AJAX_ACTION constant not found in %s', Upgrade::class)
+        );
+        $this->assertArrayHasKey(
+            'UPGRADES_LIST_TABLE_ACTION',
+            $constants,
+            \sprintf('UPGRADES_LIST_TABLE_ACTION constant not found in %s', Upgrade::class)
+        );
+        $this->assertArrayHasKey(
+            'MENU_SLUG',
+            $constants,
+            \sprintf('MENU_SLUG constant not found in %s', Upgrade::class)
+        );
     }
 
     /**

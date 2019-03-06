@@ -9,8 +9,7 @@ use WP_UnitTestCase;
 
 /**
  * Class WpUnitTestCase
- *
- * @package OpenFit\ScheduledPosts\PhpUnit
+ * @package TheFrosty\WpUpgradeTaskRunner\PhpUnit
  */
 class WpUnitTestCase extends WP_UnitTestCase
 {
