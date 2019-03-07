@@ -20,7 +20,6 @@ class UpgradesListTable extends \WP_List_Table
     private const COLUMN_DESCRIPTION = UpgradeModel::FIELD_DESCRIPTION;
     private const COLUMN_EXECUTED = 'executed';
     private const DESCRIPTION_CONCATENATION_LENGTH = 220;
-    private const NONCE_KEY = 'task_runner_migration_upgrades_nonce_%s';
     private const PER_PAGE = 30;
 
     /**
@@ -189,12 +188,12 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
                         ],
                         ''
                     ),
-                    $this->getNonceKeyValue($item->getTitle()),
+                    $this->container[ServiceProvider::UPGRADE_PROVIDER]->getNonceKeyValue($item->getTitle()),
                     Upgrade::NONCE_NAME
                 ),
                 Upgrade::AJAX_ACTION,
                 \esc_attr($item->getTitle()),
-                \wp_create_nonce($this->getNonceKeyValue($item->getTitle())),
+                \wp_create_nonce($this->container[ServiceProvider::UPGRADE_PROVIDER]->getNonceKeyValue($item->getTitle())),
                 \esc_html_x('Run', 'Run. meaning to execute a task', 'wp-upgrade-task-runner'),
                 \esc_attr($item->getTitle())
             ),
@@ -281,16 +280,6 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
         ]);
 
         unset($data, $total_items);
-    }
-
-    /**
-     * Helper to return the correct nonce key value for each upgrade model item.
-     * @param string $title Current upgrade title from the UpgradeModel.
-     * @return string
-     */
-    public function getNonceKeyValue(string $title): string
-    {
-        return \sprintf(self::NONCE_KEY, \sanitize_title_with_dashes($title));
     }
 
     /**

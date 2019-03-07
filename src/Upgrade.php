@@ -23,6 +23,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     public const MENU_SLUG = 'upgrade-task-runner';
     public const NONCE_NAME = '_task_runner_execute_nonce';
     public const OPTION_NAME = 'wp_upgrade_task_runner';
+    private const NONCE_KEY = 'task_runner_migration_upgrades_nonce_%s';
 
     /**
      * Container object.
@@ -69,6 +70,16 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     }
 
     /**
+     * Helper to return the correct nonce key value for each upgrade model item.
+     * @param string $title Current upgrade title from the UpgradeModel.
+     * @return string
+     */
+    public function getNonceKeyValue(string $title): string
+    {
+        return \sprintf(self::NONCE_KEY, \sanitize_title_with_dashes($title));
+    }
+
+    /**
      * Register our dashboard page.
      * `add_dashboard_page()` returns false if the current user doesn't have the capability.
      */
@@ -112,7 +123,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
                 'jquery-ui-core',
                 'jquery-ui-dialog',
             ],
-            null,
+            VERSION,
             true
         );
         \wp_register_script(
@@ -121,13 +132,13 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             [
                 'jquery',
             ],
-            null,
+            VERSION,
             true
         );
         \wp_register_style(
             'upgrade-task-runner',
             $this->getPlugin()->getUrl('/assets/upgrades.css'),
-            null,
+            VERSION,
             null
         );
         \wp_enqueue_style('wp-jquery-ui-dialog');
@@ -169,7 +180,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
 
         if (!\wp_verify_nonce(
             $query->get(self::NONCE_NAME),
-            $this->list_table->getNonceKeyValue(\rawurldecode($query->get('item', '')))
+            $this->getNonceKeyValue(\rawurldecode($query->get('item', '')))
         )) {
             return;
         }
@@ -202,7 +213,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
         }
 
         if (\check_ajax_referer(
-            $this->list_table->getNonceKeyValue($request->get('item')),
+            $this->getNonceKeyValue($request->get('item')),
             false,
             false
         )) {
