@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [1.1.3] - 2019-03-07
+### Fixed
+- getOption not loading. Moved from `UpgradesListTable` to `Upgrade` and renamed to getOptions.
+
 ## [1.1.2] - 2019-03-07
 ### Fixed
 - Moved `getNonceKeyValue` method from `UpgradesListTable` to `Upgrade` since UpgradesListTable is no longer loaded outside
