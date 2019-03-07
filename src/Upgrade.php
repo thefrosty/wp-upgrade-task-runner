@@ -23,6 +23,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     public const MENU_SLUG = 'upgrade-task-runner';
     public const NONCE_NAME = '_task_runner_execute_nonce';
     public const OPTION_NAME = 'wp_upgrade_task_runner';
+    private const NONCE_KEY = 'task_runner_migration_upgrades_nonce_%s';
 
     /**
      * Container object.
@@ -66,6 +67,16 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
         $this->addAction('admin_menu', [$this, 'addDashboardPage']);
         $this->addAction('admin_enqueue_scripts', [$this, 'enqueueScripts']);
         $this->addAction('wp_ajax_' . self::AJAX_ACTION, [$this, 'scheduleTaskRunnerEvent']);
+    }
+
+    /**
+     * Helper to return the correct nonce key value for each upgrade model item.
+     * @param string $title Current upgrade title from the UpgradeModel.
+     * @return string
+     */
+    public function getNonceKeyValue(string $title): string
+    {
+        return \sprintf(self::NONCE_KEY, \sanitize_title_with_dashes($title));
     }
 
     /**
@@ -169,7 +180,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
 
         if (!\wp_verify_nonce(
             $query->get(self::NONCE_NAME),
-            $this->list_table->getNonceKeyValue(\rawurldecode($query->get('item', '')))
+            $this->getNonceKeyValue(\rawurldecode($query->get('item', '')))
         )) {
             return;
         }
@@ -202,7 +213,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
         }
 
         if (\check_ajax_referer(
-            $this->list_table->getNonceKeyValue($request->get('item')),
+            $this->getNonceKeyValue($request->get('item')),
             false,
             false
         )) {
