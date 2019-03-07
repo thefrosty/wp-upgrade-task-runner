@@ -215,7 +215,6 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             $fields = (new \ReflectionClass($this->task_loader))->getMethod('registerFields');
             $fields->setAccessible(true);
             $fields->invoke($this->task_loader);
-            $fields->setAccessible(false);
             unset($fields);
         } catch (\ReflectionException $exception) {
             \wp_send_json_error(['error' => $exception->getMessage()]);
@@ -262,7 +261,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             true
         );
 
-        if (\is_string($key) && isset($this->task_loader->getFields()[$key])) {
+        if (isset($this->task_loader->getFields()[$key])) {
             /**
              * UpgradeModel object.
              * @var UpgradeModel $model

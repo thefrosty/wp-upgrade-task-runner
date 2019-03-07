@@ -119,7 +119,6 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
     /**
      * Register our fields array of objects. This is called early so we can calculate the number of
      * upgrades that need to be run to show a count in the menu.
-     * THIS IS WHERE YOU ADD NEW "UPGRADE/MIGRATION" TASKS.
      */
     protected function registerFields()
     {
