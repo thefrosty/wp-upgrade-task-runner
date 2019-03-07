@@ -123,7 +123,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
                 'jquery-ui-core',
                 'jquery-ui-dialog',
             ],
-            null,
+            VERSION,
             true
         );
         \wp_register_script(
@@ -132,13 +132,13 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             [
                 'jquery',
             ],
-            null,
+            VERSION,
             true
         );
         \wp_register_style(
             'upgrade-task-runner',
             $this->getPlugin()->getUrl('/assets/upgrades.css'),
-            null,
+            VERSION,
             null
         );
         \wp_enqueue_style('wp-jquery-ui-dialog');
