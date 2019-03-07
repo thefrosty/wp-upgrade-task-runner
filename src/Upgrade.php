@@ -106,7 +106,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
 
         \wp_register_script(
             'upgrade-task-runner-dialog',
-            $this->getPlugin()->getUrl('/assets/js/dialog.js'),
+            $this->getPlugin()->getUrl('/assets/dialog.js'),
             [
                 'jquery',
                 'jquery-ui-core',
@@ -117,7 +117,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
         );
         \wp_register_script(
             'upgrade-task-runner',
-            $this->getPlugin()->getUrl('/assets/js/upgrades.js'),
+            $this->getPlugin()->getUrl('/assets/upgrades.js'),
             [
                 'jquery',
             ],
@@ -126,7 +126,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
         );
         \wp_register_style(
             'upgrade-task-runner',
-            $this->getPlugin()->getUrl('/assets/css/upgrades.css'),
+            $this->getPlugin()->getUrl('/assets/upgrades.css'),
             null,
             null
         );
