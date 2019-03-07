@@ -115,15 +115,9 @@ class UpgradesListTable extends \WP_List_Table
      * Get the options.
      * @return array
      */
-    public function getOption(): array
+    public function getOptions(): array
     {
-        static $options;
-
-        if (empty($options)) {
-            $options = \get_option(Upgrade::OPTION_NAME, []);
-        }
-
-        return $options;
+        return $this->container[ServiceProvider::UPGRADE_PROVIDER]->getOptions();
     }
 
     /**
@@ -146,7 +140,7 @@ class UpgradesListTable extends \WP_List_Table
                 return $this->buildDescription($item);
 
             case self::COLUMN_EXECUTED:
-                $options = $this->getOption();
+                $options = $this->getOptions();
 
                 return empty($options[\sanitize_title($item->getTitle())]) ?
                     '<span class="dashicons dashicons-no"></span>' :
@@ -201,8 +195,8 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
 
         if ($request->query->has('item') && $request->query->get('item') === $item->getTitle()) {
             $actions = ['run' => '<a href="javascript:void(0)">Running...</a>'];
-        } elseif (!empty($this->getOption()[\sanitize_title($item->getTitle())])) {
-            $completed = $this->getOption()[\sanitize_title($item->getTitle())];
+        } elseif (!empty($this->getOptions()[\sanitize_title($item->getTitle())])) {
+            $completed = $this->getOptions()[\sanitize_title($item->getTitle())];
             $datetime = (new \DateTime($completed, new \DateTimeZone('UTC')));
             $actions = [
                 'run' => \sprintf(
