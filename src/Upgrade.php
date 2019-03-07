@@ -70,6 +70,21 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     }
 
     /**
+     * Get the options.
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        static $options;
+
+        if (empty($options)) {
+            $options = \get_option(Upgrade::OPTION_NAME, []);
+        }
+
+        return $options;
+    }
+
+    /**
      * Helper to return the correct nonce key value for each upgrade model item.
      * @param string $title Current upgrade title from the UpgradeModel.
      * @return string
@@ -253,7 +268,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
              * @var UpgradeModel $model
              */
             $model = $this->task_loader->getFields()[$key];
-            $options = $this->list_table->getOption();
+            $options = $this->getOptions();
             if (!isset($options[\sanitize_title($model->getTitle())]) ||
                 empty($options[\sanitize_title($model->getTitle())])
             ) {
@@ -288,6 +303,6 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
      */
     private function getUpgradeCount(): int
     {
-        return \absint(\count($this->task_loader->getFields()) - \count($this->list_table->getOption()));
+        return \absint(\count($this->task_loader->getFields()) - \count($this->getOptions()));
     }
 }
