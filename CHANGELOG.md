@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [1.1.2] - 2019-03-07
+### Fixed
+- Moved `getNonceKeyValue` method from `UpgradesListTable` to `Upgrade` since UpgradesListTable is no longer loaded outside
+the dashboard (settings) page, which causes a null return value on AJAX requests stopping the execution and throwing
+a 500 server error.
+- Added version value to all registered assets.
+
+## [1.1.1] - 2019-03-06
+### Fixed
+- Add missing CSS file, and update location of registered scripts and styles pointing to incorrect directory.
 
 ## [1.1.0] - 2019-03-06
 ### Fixed
