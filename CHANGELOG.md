@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [1.2.0] - 2019-03-07
+- Ready for public release.
+### Fixed
+- Loading of classes now initiated on plugins_loaded priority 5 instead of conditional checks for admin and AJAX.
+- Removed string check on tasks array key checks.
+
 ## [1.1.3] - 2019-03-07
 ### Fixed
 - getOption not loading. Moved from `UpgradesListTable` to `Upgrade` and renamed to getOptions.
