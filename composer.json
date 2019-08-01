@@ -20,7 +20,7 @@
   "require": {
     "php": ">=7.1",
     "pimple/pimple": "^3.2",
-    "symfony/http-foundation": "^3.4|^4",
+    "symfony/http-foundation": "^3.4||^4",
     "thefrosty/wp-utilities": "^1.4.1"
   },
   "require-dev": {
