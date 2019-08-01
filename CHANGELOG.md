@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [1.2.1] - 2019-03-07
+- Allow Symfony Http Foundation 4.
+
 ## [1.2.0] - 2019-03-07
 - Ready for public release.
 ### Fixed

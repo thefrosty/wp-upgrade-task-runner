@@ -6,7 +6,7 @@
  * Plugin Name: Upgrade Task Runner
  * Plugin URI: https://github.com/thefrosty/wp-upgrade-task-runner
  * Description: A WordPress plugin for developers to write custom migration tasks.
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Austin Passy
  * Author URI: https://github.com/thefrosty
  * Requires at least: 4.8
