@@ -205,7 +205,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
                     \sprintf(
                         '<time datetime="%s">%s</time>',
                         $datetime->format(\DateTime::ISO8601),
-                        $datetime->setTimeZone(new \DateTimeZone(\get_option('timezone_string')))->format('l, M d, Y h:i:s T')
+                        $datetime->setTimeZone(new \DateTimeZone($this->wpGetTimezoneString()))->format('l, M d, Y h:i:s T')
                     )
                 ),
             ];
@@ -333,5 +333,46 @@ data-id="#%1$s" title="%2$s">%2$s</a>',
         }
 
         return $item->getDescription();
+    }
+
+    /**
+     * Returns the timezone string for a site, even if it's set to a UTC offset.
+     * Adapted from http://www.php.net/manual/en/function.timezone-name-from-abbr.php#89155
+     * @return string valid PHP timezone string
+     */
+    private function wpGetTimezoneString(): string
+    {
+        $timezone = \get_option('timezone_string');
+        // if site timezone string exists, return it
+        if (\is_string($timezone)) {
+            return $timezone;
+        }
+
+        // get UTC offset, if it isn't set then return UTC
+        if (($utc_offset = \get_option('gmt_offset', 0)) === 0) {
+            return 'UTC';
+        }
+
+        // adjust UTC offset from hours to seconds
+        $utc_offset *= 3600;
+
+        // attempt to guess the timezone string from the UTC offset
+        $timezone = \timezone_name_from_abbr('', $utc_offset, 0);
+        if (\is_string($timezone)) {
+            return $timezone;
+        }
+
+        // last try, guess timezone string manually
+        $is_dst = \date('I');
+        foreach (\timezone_abbreviations_list() as $abbr) {
+            foreach ($abbr as $city) {
+                if ($city['dst'] === $is_dst && $city['offset'] === $utc_offset) {
+                    return $city['timezone_id'];
+                }
+            }
+        }
+
+        // fallback to UTC
+        return 'UTC';
     }
 }
