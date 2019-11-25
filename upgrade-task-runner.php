@@ -10,7 +10,7 @@
  * Author: Austin Passy
  * Author URI: https://github.com/thefrosty
  * Requires at least: 4.8
- * Tested up to: 5.0
+ * Tested up to: 5.2
  * Requires PHP: 7.1
  *
  * @package TheFrosty\WpUpgradeTaskRunner
@@ -19,7 +19,7 @@
 namespace TheFrosty\WpUpgradeTaskRunner;
 
 const SLUG = 'wp-upgrade-task-runner';
-const VERSION = '1.2.0';
+const VERSION = '1.3.0';
 
 use TheFrosty\WpUtilities\Plugin\Container;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
