@@ -1,3 +1,5 @@
+.git/ export-ignore
+bin/ export-ignore
 coverage/ export-ignore
 tests/ export-ignore
 .travis.yml export-ignore
