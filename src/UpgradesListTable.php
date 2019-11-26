@@ -337,42 +337,28 @@ data-id="#%1$s" title="%2$s">%2$s</a>',
 
     /**
      * Returns the timezone string for a site, even if it's set to a UTC offset.
-     * Adapted from http://www.php.net/manual/en/function.timezone-name-from-abbr.php#89155
+     * @link https://developer.wordpress.org/reference/functions/wp_timezone_string/
+     * @uses wp_timezone_string() WordPress >= 5.3
+     *
      * @return string valid PHP timezone string
      */
     private function wpGetTimezoneString(): string
     {
-        $timezone = \get_option('timezone_string');
-        // if site timezone string exists, return it
-        if (\is_string($timezone)) {
-            return $timezone;
+        if (\function_exists('\wp_timezone_string')) {
+            return \wp_timezone_string();
+        }
+        $timezone_string = \get_option('timezone_string');
+        if (\is_string($timezone_string)) {
+            return $timezone_string;
         }
 
-        // get UTC offset, if it isn't set then return UTC
-        if (($utc_offset = \get_option('gmt_offset', 0)) === 0) {
-            return 'UTC';
-        }
+        $offset = (float)\get_option('gmt_offset');
+        $hours = (int)$offset;
+        $minutes = ($offset - $hours);
 
-        // adjust UTC offset from hours to seconds
-        $utc_offset *= 3600;
+        $sign = ($offset < 0) ? '-' : '+';
+        $tz_offset = \sprintf('%s%02d:%02d', $sign, \abs($hours), \abs($minutes * 60));
 
-        // attempt to guess the timezone string from the UTC offset
-        $timezone = \timezone_name_from_abbr('', $utc_offset, 0);
-        if (\is_string($timezone)) {
-            return $timezone;
-        }
-
-        // last try, guess timezone string manually
-        $is_dst = \date('I');
-        foreach (\timezone_abbreviations_list() as $abbr) {
-            foreach ($abbr as $city) {
-                if ($city['dst'] === $is_dst && $city['offset'] === $utc_offset) {
-                    return $city['timezone_id'];
-                }
-            }
-        }
-
-        // fallback to UTC
-        return 'UTC';
+        return $tz_offset;
     }
 }
