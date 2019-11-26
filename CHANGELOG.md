@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 
 ## [1.3.0] - 2019-11-25
-- Make sure WordPress' option for `timezone_string` returns a string, update to use helper method. Fixes #9.
+- Make sure WordPress' option for `timezone_string` returns a string, update to use helper method which will call
+WordPress's new `wp_timezone_string` if available (WordPress >= 5.3) otherwise uses it's code. Fixes #9.
 
 ## [1.2.1] - 2019-03-07
 - Allow Symfony Http Foundation 4.
