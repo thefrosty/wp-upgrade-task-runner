@@ -21,7 +21,7 @@
     "php": ">=7.1",
     "pimple/pimple": "^3.2",
     "symfony/http-foundation": "^3.4||^4",
-    "thefrosty/wp-utilities": "^1.4.1"
+    "thefrosty/wp-utilities": "^1.7"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3",

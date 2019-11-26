@@ -205,7 +205,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
                     \sprintf(
                         '<time datetime="%s">%s</time>',
                         $datetime->format(\DateTime::ISO8601),
-                        $datetime->setTimeZone(new \DateTimeZone(\get_option('timezone_string')))->format('l, M d, Y h:i:s T')
+                        $datetime->setTimeZone(new \DateTimeZone($this->wpGetTimezoneString()))->format('l, M d, Y h:i:s T')
                     )
                 ),
             ];
@@ -333,5 +333,32 @@ data-id="#%1$s" title="%2$s">%2$s</a>',
         }
 
         return $item->getDescription();
+    }
+
+    /**
+     * Returns the timezone string for a site, even if it's set to a UTC offset.
+     * @link https://developer.wordpress.org/reference/functions/wp_timezone_string/
+     * @uses wp_timezone_string() WordPress >= 5.3
+     *
+     * @return string valid PHP timezone string
+     */
+    private function wpGetTimezoneString(): string
+    {
+        if (\function_exists('\wp_timezone_string')) {
+            return \wp_timezone_string();
+        }
+        $timezone_string = \get_option('timezone_string');
+        if (\is_string($timezone_string)) {
+            return $timezone_string;
+        }
+
+        $offset = (float)\get_option('gmt_offset');
+        $hours = (int)$offset;
+        $minutes = ($offset - $hours);
+
+        $sign = ($offset < 0) ? '-' : '+';
+        $tz_offset = \sprintf('%s%02d:%02d', $sign, \abs($hours), \abs($minutes * 60));
+
+        return $tz_offset;
     }
 }
