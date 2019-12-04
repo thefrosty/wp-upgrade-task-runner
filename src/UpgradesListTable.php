@@ -15,6 +15,7 @@ use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModelFactory;
  */
 class UpgradesListTable extends \WP_List_Table
 {
+
     private const COLUMN_DATE = UpgradeModel::FIELD_DATE;
     private const COLUMN_TITLE = UpgradeModel::FIELD_TITLE;
     private const COLUMN_DESCRIPTION = UpgradeModel::FIELD_DESCRIPTION;
@@ -36,8 +37,8 @@ class UpgradesListTable extends \WP_List_Table
 
     /**
      * UpgradesListTable constructor.
-     * @see WP_List_Table::__construct()
      * @param Container $container
+     * @see WP_List_Table::__construct()
      */
     public function __construct(Container $container)
     {
@@ -56,7 +57,7 @@ class UpgradesListTable extends \WP_List_Table
      */
     public function registerUpgrade(array $fields): UpgradesListTable
     {
-        $this->upgrade_models[] = $this->getUpgradeModelFactory()->createModel($fields);
+        $this->upgrade_models[] = UpgradeModelFactory::createModel($fields);
 
         return $this;
     }
@@ -65,20 +66,11 @@ class UpgradesListTable extends \WP_List_Table
      * Register multiple updates at once.
      * @param UpgradeModel[] $upgrades Array of UpgradeModel objects.
      */
-    public function registerUpgrades(array $upgrades)
+    public function registerUpgrades(array $upgrades): void
     {
         \array_walk($upgrades, function (UpgradeModel $upgrade) {
             $this->upgrade_models[] = $upgrade;
         });
-    }
-
-    /**
-     * Return the UpgradeModelFactory object property.
-     * @return UpgradeModelFactory
-     */
-    protected function getUpgradeModelFactory(): UpgradeModelFactory
-    {
-        return $this->container[ServiceProvider::UPGRADE_MODEL_FACTORY];
     }
 
     /**
@@ -91,15 +83,6 @@ class UpgradesListTable extends \WP_List_Table
     }
 
     /**
-     * Return the UpgradeModelFactory object property.
-     * @return int
-     */
-    public function getUpgradeModelCount(): int
-    {
-        return \count($this->upgrade_models);
-    }
-
-    /**
      * Return the upgrades data.
      * @return UpgradeModel[]
      */
@@ -109,15 +92,6 @@ class UpgradesListTable extends \WP_List_Table
         \usort($upgrade_data, [$this, 'usortReorder']);
 
         return $upgrade_data;
-    }
-
-    /**
-     * Get the options.
-     * @return array
-     */
-    public function getOptions(): array
-    {
-        return $this->container[ServiceProvider::UPGRADE_PROVIDER]->getOptions();
     }
 
     /**
@@ -140,34 +114,43 @@ class UpgradesListTable extends \WP_List_Table
                 return $this->buildDescription($item);
 
             case self::COLUMN_EXECUTED:
-                $options = $this->getOptions();
+                $options = Option::getOptions();
+                $key = Option::getOptionKey($item);
+                if (empty($options[$key])) {
+                    return '<span class="dashicons dashicons-no"></span>';
+                }
+                $date = !empty($options[$key][Option::SETTING_DATE]) ?
+                    $options[$key][Option::SETTING_DATE] : $options[$key];
+                $user = !empty($options[$key][Option::SETTING_USER]) ?
+                    \get_user_by('ID', $options[$key][Option::SETTING_USER]) : null;
 
-                return empty($options[\sanitize_title($item->getTitle())]) ?
-                    '<span class="dashicons dashicons-no"></span>' :
+                return \sprintf(
+                    '<span title="%s" class="dashicons dashicons-yes"></span>',
                     \sprintf(
-                        '<span title="%s" class="dashicons dashicons-yes"></span>',
-                        \sprintf(
-                            '%s was run on %s',
-                            $item->getTitle(),
-                            $options[\sanitize_title($item->getTitle())]
-                        )
-                    );
+                        '%s was run on %s by %s',
+                        $item->getTitle(),
+                        $date,
+                        $user instanceof \WP_User ? $user->user_login : 'N/A',
+                    )
+                );
         }
 
         return '';
     }
 
     /**
-     * @see WP_List_Table::::single_row_columns()
      * @param UpgradeModel $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td>
      * phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
      * phpcs:disable WordPress.VIP.ValidatedSanitizedInput.InputNotValidated
      * @throws
+     * @see WP_List_Table::::single_row_columns()
      */
     public function column_title(UpgradeModel $item): string
     {
         $request = $this->getHttpRequest();
+        $options = Option::getOptions();
+        $key = Option::getOptionKey($item);
         // Build row actions
         $actions = [
             'run' => \sprintf(
@@ -195,18 +178,22 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
 
         if ($request->query->has('item') && $request->query->get('item') === $item->getTitle()) {
             $actions = ['run' => '<a href="javascript:void(0)">Running...</a>'];
-        } elseif (!empty($this->getOptions()[\sanitize_title($item->getTitle())])) {
-            $completed = $this->getOptions()[\sanitize_title($item->getTitle())];
-            $datetime = (new \DateTime($completed, new \DateTimeZone('UTC')));
+        } elseif (!empty($options[$key])) {
+            $date = !empty($options[$key][Option::SETTING_DATE]) ? $options[$key][Option::SETTING_DATE] : $options[$key];
+            $datetime = (new \DateTime($date, new \DateTimeZone('UTC')));
+            $user = !empty($options[$key][Option::SETTING_USER]) ?
+                \get_user_by('ID', $options[$key][Option::SETTING_USER]) : null;
+
             $actions = [
                 'run' => \sprintf(
-                    '<a href="javascript:void(0)">%s</a> on %s',
+                    '<a href="javascript:void(0)">%s</a> on %s by %s',
                     \esc_html__('Completed', 'wp-upgrade-task-runner'),
                     \sprintf(
                         '<time datetime="%s">%s</time>',
                         $datetime->format(\DateTime::ISO8601),
                         $datetime->setTimeZone(new \DateTimeZone($this->wpGetTimezoneString()))->format('l, M d, Y h:i:s T')
-                    )
+                    ),
+                    $user instanceof \WP_User ? $user->user_login : 'N/A'
                 ),
             ];
         }
@@ -219,8 +206,8 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
      * The 'cb' column is treated differently than the rest. If including a checkbox
      * column in your table you must create a column_cb() method. If you don't need
      * bulk actions or checkboxes, simply leave the 'cb' entry out of your array.
-     * @see WP_List_Table::::single_row_columns()
      * @return array An associative array containing column information: 'slugs'=>'Visible Titles'
+     * @see WP_List_Table::::single_row_columns()
      */
     public function get_columns(): array
     {
@@ -295,7 +282,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
         $order = $request->query->has('order') ? \esc_attr(\wp_unslash($request->query->get('order'))) : 'desc';
         $result = \strcmp($model1->getDateFormat('c'), $model2->getDateFormat('c'));
 
-        return $order === 'asc' ? $result : -$result; // Send final sort direction to usort
+        return \strtolower($order) === 'asc' ? $result : -$result; // Send final sort direction to usort
     }
 
     /**
