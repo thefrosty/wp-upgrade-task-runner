@@ -13,11 +13,12 @@ use TheFrosty\WpUtilities\Models\BaseModel;
  */
 class UpgradeModel extends BaseModel implements UpgradeModelInterface
 {
-    const FIELD_DATE = 'date';
-    const FIELD_TITLE = 'title';
-    const FIELD_DESCRIPTION = 'description';
-    const FIELD_TASK_RUNNER = 'task_runner';
-    const REQUIRED_FIELDS = [
+
+    public const FIELD_DATE = 'date';
+    public const FIELD_TITLE = 'title';
+    public const FIELD_DESCRIPTION = 'description';
+    public const FIELD_TASK_RUNNER = 'task_runner';
+    private const REQUIRED_FIELDS = [
         self::FIELD_DATE,
         self::FIELD_TITLE,
         self::FIELD_DESCRIPTION,
@@ -98,7 +99,7 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
     /**
      * {@inheritdoc}
      */
-    public function setDate(\DateTime $date)
+    public function setDate(\DateTime $date): void
     {
         $this->date = $date;
     }
@@ -114,7 +115,7 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
     /**
      * {@inheritdoc}
      */
-    public function setTitle(string $title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -130,7 +131,7 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
     /**
      * {@inheritdoc}
      */
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -146,7 +147,7 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
     /**
      * {@inheritdoc}
      */
-    public function setTaskRunner(TaskRunnerInterface $task_runner)
+    public function setTaskRunner(TaskRunnerInterface $task_runner): void
     {
         $this->task_runner = $task_runner;
     }
