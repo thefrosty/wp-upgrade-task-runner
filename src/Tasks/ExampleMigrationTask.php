@@ -23,11 +23,11 @@ class ExampleMigrationTask extends AbstractTaskRunner
      *
      * @param UpgradeModel $model
      */
-    public function dispatch(UpgradeModel $model)
+    public function dispatch(UpgradeModel $model): void
     {
         \error_log(\sprintf('[Migration] %s is running...', self::class));
         $this->longRunningTask();
-        $this->clearScheduledEvent(\get_class($this));
+        $this->clearScheduledEvent(\get_class($this), $model);
         $this->complete($model);
         \error_log(\sprintf('[Migration] %s completed successfully.', self::class));
     }
