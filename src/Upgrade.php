@@ -5,7 +5,6 @@ namespace TheFrosty\WpUpgradeTaskRunner;
 use Pimple\Container;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
-use TheFrosty\WpUpgradeTaskRunner\Tasks\TaskLoader;
 use TheFrosty\WpUtilities\Plugin\AbstractHookProvider;
 use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestInterface;
 use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestTrait;
@@ -16,6 +15,7 @@ use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestTrait;
  */
 class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInterface
 {
+
     use HttpFoundationRequestTrait;
 
     public const AJAX_ACTION = 'wp_upgrade_schedule_task_event';
@@ -46,7 +46,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
 
     /**
      * TaskLoader object.
-     * @var TaskLoader $task_loader
+     * @var Tasks\TaskLoader $task_loader
      */
     private $task_loader;
 
@@ -87,7 +87,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     protected function addDashboardPage(): void
     {
         if (!\class_exists('WP_List_Table')) {
-            require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
+            require_once \ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
         }
         $this->list_table = new UpgradesListTable($this->container);
         $this->settings_page = \add_dashboard_page(
@@ -95,14 +95,16 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             \sprintf(\__('Migration Tasks %s', 'wp-upgrade-task-runner'), $this->getUpgradeCountHtml()),
             'promote_users',
             self::MENU_SLUG,
-            function () {
+            function (): void {
                 include $this->getPlugin()->getPath('/views/wp-admin/settings-pages/upgrades.php');
             }
         );
-        if (\is_string($this->settings_page)) {
-            $this->task_loader->registerScreenId($this->settings_page);
-            $this->addAction('load-' . $this->settings_page, [$this, 'maybeExecute']);
+        if (!\is_string($this->settings_page)) {
+            return;
         }
+
+        $this->task_loader->registerScreenId($this->settings_page);
+        $this->addAction('load-' . $this->settings_page, [$this, 'maybeExecute']);
     }
 
     /**
@@ -240,7 +242,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     {
         $key = \array_search(
             \rawurldecode($bag->get('item')),
-            \array_map(function (UpgradeModel $model): string {
+            \array_map(static function (UpgradeModel $model): string {
                 return $model->getTitle();
             }, $this->task_loader->getFields()),
             true

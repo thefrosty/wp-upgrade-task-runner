@@ -27,7 +27,7 @@ interface UpgradeModelInterface
      * @param string $format Defaults to `DATE_ISO8601`.
      * @return string
      */
-    public function getDateFormat(string $format = DATE_ISO8601): string;
+    public function getDateFormat(string $format = \DATE_ISO8601): string;
 
     /**
      * Sets the the upgrade was created (not run). When passing the value from the array, use a

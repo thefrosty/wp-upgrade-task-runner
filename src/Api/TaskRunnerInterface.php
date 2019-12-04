@@ -8,13 +8,14 @@ use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
  * Interface TaskRunnerInterface
  *
  * @package TheFrosty\WpUpgradeTaskRunner\Api
+ * phpcs:disable SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming.SuperfluousPrefix
  */
 interface TaskRunnerInterface
 {
 
-    const DATE = null;
-    const DESCRIPTION = null;
-    const TITLE = null;
+    public const DATE = null;
+    public const DESCRIPTION = null;
+    public const TITLE = null;
 
     /**
      * Dispatch the migration task.
@@ -36,6 +37,7 @@ interface TaskRunnerInterface
      *
      * @param string $class The fully-qualified class-name to register as a cron hook.
      * @param UpgradeModel $model Arguments to pass to the hook's callback function.
+     * @uses wp_schedule_single_event()
      */
     public function scheduleEvent(string $class, UpgradeModel $model): void;
 
@@ -44,6 +46,9 @@ interface TaskRunnerInterface
      *
      * @param string $class The fully-qualified class-name to register as a cron hook.
      * @param UpgradeModel $model Arguments to pass to the hook's callback function.
+     * @uses wp_clear_scheduled_hook()
+     * @uses wp_next_scheduled()
+     * @uses wp_unschedule_event()
      */
     public function clearScheduledEvent(string $class, UpgradeModel $model): void;
 }

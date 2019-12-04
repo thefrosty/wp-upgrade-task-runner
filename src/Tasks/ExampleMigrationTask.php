@@ -13,6 +13,7 @@ use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
  */
 class ExampleMigrationTask extends AbstractTaskRunner
 {
+
     public const DATE = '2018-05-23';
     public const DESCRIPTION = 'This is an example upgrade/migration task. It does not do anything 
     except sleep for five seconds before it "completes" it\'s task.';
@@ -27,7 +28,7 @@ class ExampleMigrationTask extends AbstractTaskRunner
     {
         \error_log(\sprintf('[Migration] %s is running...', self::class));
         $this->longRunningTask();
-        $this->clearScheduledEvent(\get_class($this), $model);
+        $this->clearScheduledEvent(static::class, $model);
         $this->complete($model);
         \error_log(\sprintf('[Migration] %s completed successfully.', self::class));
     }
@@ -35,7 +36,7 @@ class ExampleMigrationTask extends AbstractTaskRunner
     /**
      * Example task that needs to "run".
      */
-    private function longRunningTask()
+    private function longRunningTask(): void
     {
         \sleep(5);
     }

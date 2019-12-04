@@ -9,17 +9,23 @@ use TheFrosty\WpUpgradeTaskRunner\Option;
  * Class TaskRunner
  *
  * @package TheFrosty\WpUpgradeTaskRunner\Api
+ * phpcs:disable SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming.SuperfluousPrefix
  */
 abstract class AbstractTaskRunner implements TaskRunnerInterface
 {
 
     /**
-     * {@inheritdoc}
+     * Dispatch the migration task.
+     *
+     * @param UpgradeModel $model
      */
     abstract public function dispatch(UpgradeModel $model): void;
 
     /**
-     * {@inheritdoc}
+     * Trigger events when the task is complete.
+     *
+     * @param UpgradeModel $model
+     * @return bool
      */
     public function complete(UpgradeModel $model): bool
     {
@@ -28,7 +34,7 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
         if (empty($options[$key])) {
             $options[$key] = [
                 Option::SETTING_DATE => $this->getDate(),
-                Option::SETTING_TASK_RUNNER => \esc_attr(\get_class($this)),
+                Option::SETTING_TASK_RUNNER => \esc_attr(static::class),
                 Option::SETTING_USER => \get_current_user_id(),
             ];
         }
@@ -37,7 +43,10 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Schedule a one off cron event.
+     *
+     * @param string $class The fully-qualified class-name to register as a cron hook.
+     * @param UpgradeModel $model Arguments to pass to the hook's callback function.
      * @uses wp_schedule_single_event()
      */
     public function scheduleEvent(string $class, UpgradeModel $model): void
@@ -46,7 +55,10 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Clear the one off scheduled cron event, in-case it isn't cleared automatically.
+     *
+     * @param string $class The fully-qualified class-name to register as a cron hook.
+     * @param UpgradeModel $model Arguments to pass to the hook's callback function.
      * @uses wp_clear_scheduled_hook()
      * @uses wp_next_scheduled()
      * @uses wp_unschedule_event()
@@ -65,14 +77,15 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
 
     /**
      * Get a date formatted string.
+     *
      * @return string
      */
     private function getDate(): string
     {
         try {
             return (new \DateTime('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC850);
-        } catch (\Exception $exception) {
-            return (date_create('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC850);
+        } catch (\Throwable $exception) {
+            return \date_create('now', new \DateTimeZone('UTC'))->format(\DateTime::RFC850);
         }
     }
 }
