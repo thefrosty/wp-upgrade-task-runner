@@ -14,14 +14,14 @@ final class UpgradeModelFactory
      * Create an UpgradeModel.
      *
      * @param array $fields Incoming fields.
-     * @return UpgradeModel|array UpgradeModel on success, empty array on failure when missing required fields.
+     * @return UpgradeModel|null UpgradeModel on success, empty array on failure when missing required fields.
      */
-    public function createModel(array $fields): UpgradeModel
+    public static function createModel(array $fields): ?UpgradeModel
     {
         try {
             return new UpgradeModel($fields);
         } catch (Exception $exception) {
-            return [];
+            return null;
         }
     }
 }
