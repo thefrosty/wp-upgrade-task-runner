@@ -24,6 +24,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     public const NONCE_NAME = '_task_runner_execute_nonce';
     public const OPTION_NAME = 'wp_upgrade_task_runner';
     private const NONCE_KEY = 'task_runner_migration_upgrades_nonce_%s';
+    public const TAG_SETTINGS_PAGE_LOADED = 'wp_upgrade_task_runner/settings_page_loaded';
 
     /**
      * Container object.
@@ -62,26 +63,11 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     /**
      * Add class hooks.
      */
-    public function addHooks()
+    public function addHooks(): void
     {
         $this->addAction('admin_menu', [$this, 'addDashboardPage']);
         $this->addAction('admin_enqueue_scripts', [$this, 'enqueueScripts']);
         $this->addAction('wp_ajax_' . self::AJAX_ACTION, [$this, 'scheduleTaskRunnerEvent']);
-    }
-
-    /**
-     * Get the options.
-     * @return array
-     */
-    public function getOptions(): array
-    {
-        static $options;
-
-        if (empty($options)) {
-            $options = \get_option(Upgrade::OPTION_NAME, []);
-        }
-
-        return $options;
     }
 
     /**
@@ -98,7 +84,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
      * Register our dashboard page.
      * `add_dashboard_page()` returns false if the current user doesn't have the capability.
      */
-    protected function addDashboardPage()
+    protected function addDashboardPage(): void
     {
         if (!\class_exists('WP_List_Table')) {
             require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
@@ -124,7 +110,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
      * page when a tasks description length is too long.
      * @param string $hook_suffix Admin page suffix.
      */
-    protected function enqueueScripts(string $hook_suffix)
+    protected function enqueueScripts(string $hook_suffix): void
     {
         if ($this->settings_page !== $hook_suffix) {
             return;
@@ -181,11 +167,10 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     /**
      * On our settings page, check for our item and a valid nonce key so we
      * can execute a single task to our cron.
-     * @SuppressWarnings(PHPMD.ExitExpression)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function maybeExecute()
+    protected function maybeExecute(): void
     {
+        \do_action(Upgrade::TAG_SETTINGS_PAGE_LOADED, $this->task_loader->getFields(), $this->getRequest());
         $query = $this->getRequest()->query;
         if ((!$query->has(self::NONCE_NAME) || !$query->has('item')) &&
             ($query->get(self::NONCE_NAME) !== null || $query->get('item') !== null)
@@ -209,7 +194,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     /**
      * AJAX listener to trigger a scheduled event.
      */
-    protected function scheduleTaskRunnerEvent()
+    protected function scheduleTaskRunnerEvent(): void
     {
         try {
             $fields = (new \ReflectionClass($this->task_loader))->getMethod('registerFields');
@@ -267,11 +252,10 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
              * @var UpgradeModel $model
              */
             $model = $this->task_loader->getFields()[$key];
-            $options = $this->getOptions();
-            if (!isset($options[\sanitize_title($model->getTitle())]) ||
-                empty($options[\sanitize_title($model->getTitle())])
-            ) {
-                $model->getTaskRunner()->scheduleEvent(\get_class($model->getTaskRunner()), [$model]);
+            $options = Option::getOptions();
+            $option_key = Option::getOptionKey($model);
+            if (empty($options[$option_key])) {
+                $model->getTaskRunner()->scheduleEvent(\get_class($model->getTaskRunner()), $model);
                 return true;
             }
         }
@@ -302,6 +286,6 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
      */
     private function getUpgradeCount(): int
     {
-        return \absint(\count($this->task_loader->getFields()) - \count($this->getOptions()));
+        return \absint(\count($this->task_loader->getFields()) - \count(Option::getOptions()));
     }
 }
