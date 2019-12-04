@@ -21,8 +21,8 @@
     <arg name="tab-width" value="4"/>
     <!-- For CI, don't fail on warnings -->
     <config name="ignore_warnings_on_exit" value="1"/>
-    <!-- Sets the minimum supported WP version to 4.9. -->
-    <config name="minimum_supported_wp_version" value="4.9" />
+    <!-- Sets the minimum supported WP version to 5.0. -->
+    <config name="minimum_supported_wp_version" value="5.0" />
 
     <rule ref="WordPress-Docs">
         <exclude name="Generic.Commenting.DocComment.SpacingBeforeTags"/>
@@ -36,23 +36,35 @@
 
     <rule ref="WordPress.WP.I18n">
         <properties>
-            <property name="text_domain" type="array" value="wp-scheduled-posts" />
+            <property name="text_domain" type="array" value="wp-upgrade-task-runner" />
         </properties>
+        <exclude name="WordPress.WP.I18n.MissingTranslatorsComment"/>
     </rule>
 
-    <rule ref="Inpsyde">
-        <exclude name="Inpsyde.CodeQuality.NoAccessors.NoGetter"/>
-        <exclude name="Inpsyde.CodeQuality.NoAccessors.NoSetter"/>
-        <exclude name="Inpsyde.CodeQuality.VariablesName.SnakeCaseVar"/>
-        <exclude name="NeutronStandard.Functions.DisallowCallUserFunc.CallUserFunc"/>
-        <exclude name="WordPress.WP.I18n.MissingTranslatorsComment"/>
-        <exclude name="Inpsyde.CodeQuality.LineLength.TooLong"/>
-        <exclude name="Generic.Metrics.NestingLevel.TooHigh"/>
-        <rule ref="Inpsyde.CodeQuality.PropertyPerClassLimit">
-            <properties>
-                <property name="maxCount" value="20" />
-            </properties>
-        </rule>
+    <rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/ruleset.xml">
+        <exclude name="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.IncorrectStrictTypesFormat"/>
+        <exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces.NonFullyQualified"/>
+        <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed"/>
+        <exclude name="Generic.Classes.OpeningBraceSameLine.BraceOnNewLine"/>
+        <exclude name="Generic.Functions.OpeningFunctionBraceKernighanRitchie.BraceOnNewLine"/>
+        <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation.NonFullyQualifiedClassName"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.DisallowEmpty.DisallowedEmpty"/>
+        <exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName.NoMatchBetweenTypeNameAndFileName"/>
+        <exclude name="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName"/>
+        <exclude name="SlevomatCodingStandard.Types.EmptyLinesAroundTypeBraces.NoEmptyLineBeforeClosingBrace"/>
+        <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDescriptionAndAnnotations"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison.RequiredYodaComparison"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversableParameterTypeHintSpecification"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversableReturnTypeHintSpecification"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversablePropertyTypeHintSpecification"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses.UselessParentheses"/>
+        <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountAfterLastContent"/>
+        <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDifferentAnnotationsTypes"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.ControlStructureSpacing.IncorrectLinesCountAfterControlStructure"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.ControlStructureSpacing.IncorrectLinesCountBeforeControlStructure"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator.MultiLineTernaryOperatorNotUsed"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax.DisallowedArrayTypeHintSyntax"/>
+        <exclude name="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces.NoEmptyLineBeforeClosingBrace"/>
     </rule>
 
     <!-- We use custom indent rules for arrays -->
@@ -66,6 +78,6 @@
 
     <!-- Loads the PHP Compatibility ruleset. -->
     <rule ref="PHPCompatibility" />
-    <!-- Check for cross-version support for PHP 7.2 and higher. -->
-    <config name="testVersion" value="7.1-"/>
+    <!-- Check for cross-version support for PHP 7.3 and higher. -->
+    <config name="testVersion" value="7.3-"/>
 </ruleset>
