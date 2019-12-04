@@ -17,7 +17,7 @@ class DbUpgrade implements WpHooksInterface
 
     use HooksTrait;
 
-    private const NONCE_ACTION = __CLASS__;
+    private const NONCE_ACTION = self::class;
     private const NONCE_NAME = '_wputr_nonce';
 
     /**
@@ -109,7 +109,7 @@ class DbUpgrade implements WpHooksInterface
         }
         Option::updateOption($new_options);
         Option::setVersion(\TheFrosty\WpUpgradeTaskRunner\VERSION);
-        wp_safe_redirect(\remove_query_arg(self::NONCE_NAME));
+        \wp_safe_redirect(\remove_query_arg(self::NONCE_NAME));
         exit;
     }
 }
