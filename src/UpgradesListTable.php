@@ -12,6 +12,9 @@ use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModelFactory;
  *
  * @package TheFrosty\WpUpgradeTaskRunner
  * phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+ * phpcs:disable Generic.Commenting.DocComment.SpacingAfterTagGroup
+ * phpcs:disable SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+ * phpcs:disable SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
  */
 class UpgradesListTable extends \WP_List_Table
 {
@@ -25,18 +28,21 @@ class UpgradesListTable extends \WP_List_Table
 
     /**
      * Array of data registered to be updated.
+     *
      * @var UpgradeModel[] $upgrade_models
      */
     private $upgrade_models = [];
 
     /**
      * Container object.
+     *
      * @var Container $container
      */
     private $container;
 
     /**
      * UpgradesListTable constructor.
+     *
      * @param Container $container
      * @see WP_List_Table::__construct()
      */
@@ -52,6 +58,7 @@ class UpgradesListTable extends \WP_List_Table
 
     /**
      * Register a single update or migration to show in the upgrade list table.
+     *
      * @param array $fields Incoming fields.
      * @return $this
      */
@@ -64,17 +71,19 @@ class UpgradesListTable extends \WP_List_Table
 
     /**
      * Register multiple updates at once.
+     *
      * @param UpgradeModel[] $upgrades Array of UpgradeModel objects.
      */
     public function registerUpgrades(array $upgrades): void
     {
-        \array_walk($upgrades, function (UpgradeModel $upgrade) {
+        \array_walk($upgrades, function (UpgradeModel $upgrade): void {
             $this->upgrade_models[] = $upgrade;
         });
     }
 
     /**
      * Return the UpgradeModelFactory object property.
+     *
      * @return Request
      */
     protected function getHttpRequest(): Request
@@ -84,6 +93,7 @@ class UpgradesListTable extends \WP_List_Table
 
     /**
      * Return the upgrades data.
+     *
      * @return UpgradeModel[]
      */
     public function getUpgradeModels(): array
@@ -108,10 +118,8 @@ class UpgradesListTable extends \WP_List_Table
         switch ($column_name) {
             case self::COLUMN_DATE:
                 return $item->getDate()->format(\get_option('date_format'));
-
             case self::COLUMN_DESCRIPTION:
                 return $this->buildDescription($item);
-
             case self::COLUMN_EXECUTED:
                 $options = Option::getOptions();
                 $key = Option::getOptionKey($item);
@@ -138,12 +146,15 @@ class UpgradesListTable extends \WP_List_Table
     }
 
     /**
+     * The title column.
+     *
      * @param UpgradeModel $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td>
+     *
      * phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
      * phpcs:disable WordPress.VIP.ValidatedSanitizedInput.InputNotValidated
-     * @throws
      * @see WP_List_Table::::single_row_columns()
+     * @throws \Exception An \Exception.
      */
     public function column_title(UpgradeModel $item): string
     {
@@ -205,16 +216,17 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
      * The 'cb' column is treated differently than the rest. If including a checkbox
      * column in your table you must create a column_cb() method. If you don't need
      * bulk actions or checkboxes, simply leave the 'cb' entry out of your array.
+     *
      * @return array An associative array containing column information: 'slugs'=>'Visible Titles'
      * @see WP_List_Table::::single_row_columns()
      */
     public function get_columns(): array
     {
         return [
-            self::COLUMN_DATE => __('Date'),
-            self::COLUMN_TITLE => __('Title'),
-            self::COLUMN_DESCRIPTION => __('Description'),
-            self::COLUMN_EXECUTED => __('Executed'),
+            self::COLUMN_DATE => \__('Date', 'wp-upgrade-task-runner'),
+            self::COLUMN_TITLE => \__('Title', 'wp-upgrade-task-runner'),
+            self::COLUMN_DESCRIPTION => \__('Description', 'wp-upgrade-task-runner'),
+            self::COLUMN_EXECUTED => \__('Executed', 'wp-upgrade-task-runner'),
         ];
     }
 
@@ -223,6 +235,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
      * clickable - it does not handle the actual sorting. You still need to detect
      * the ORDERBY and ORDER querystring variables within prepare_items() and sort
      * your data accordingly (usually by modifying your query).
+     *
      * @return array An associative array containing all the columns that should be sortable:
      *               'slugs'=>array('data_values',bool)
      */
@@ -238,12 +251,14 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
 
     /**
      * Prepare the output of the items to the page.
+     *
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
      * @uses $this->get_sortable_columns()
      * @uses $this->get_pagenum()
      * @uses $this->set_pagination_args()
+     * phpcs:disable SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
      */
     public function prepare_items()
     {
@@ -268,6 +283,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
      * to handle sorting by passing the 'orderby' and 'order' values directly
      * to a custom query. The returned data will be pre-sorted, and this array
      * sorting technique would be unnecessary.
+     *
      * @param UpgradeModel $model1
      * @param UpgradeModel $model2
      * @return int
@@ -290,6 +306,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
      * concatenate it and return a shortened string with a link to an overlay to read the whole
      * thing.
      * @ref https://gist.github.com/anttiviljami/3cdefd6b5556d80426e66f131a42bef1
+     *
      * @param UpgradeModel $item A singular item (one full row's worth of data)
      * @return string
      */
@@ -297,7 +314,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
     {
         if (\strlen($item->getDescription()) >= self::DESCRIPTION_CONCATENATION_LENGTH) {
             $dialog_id = \sprintf('upgrade-task-dialog-%s', \sanitize_title($item->getTitle()));
-            \add_action('admin_footer', function () use ($item, $dialog_id) {
+            \add_action('admin_footer', static function () use ($item, $dialog_id): void {
                 ?>
                 <div id="<?php echo \sanitize_html_class($dialog_id); ?>" class="hidden" style="max-width:800px">
                     <h3><?php echo \esc_html($item->getTitle()); ?></h3>
@@ -323,6 +340,7 @@ data-id="#%1$s" title="%2$s">%2$s</a>',
 
     /**
      * Returns the timezone string for a site, even if it's set to a UTC offset.
+     *
      * @link https://developer.wordpress.org/reference/functions/wp_timezone_string/
      * @uses wp_timezone_string() WordPress >= 5.3
      *
@@ -342,9 +360,8 @@ data-id="#%1$s" title="%2$s">%2$s</a>',
         $hours = (int)$offset;
         $minutes = ($offset - $hours);
 
-        $sign = ($offset < 0) ? '-' : '+';
-        $tz_offset = \sprintf('%s%02d:%02d', $sign, \abs($hours), \abs($minutes * 60));
+        $sign = $offset < 0 ? '-' : '+';
 
-        return $tz_offset;
+        return \sprintf('%s%02d:%02d', $sign, \abs($hours), \abs($minutes * 60));
     }
 }
