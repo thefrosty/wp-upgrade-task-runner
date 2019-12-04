@@ -3,7 +3,6 @@
 namespace TheFrosty\WpUpgradeTaskRunner\Models;
 
 use TheFrosty\WpUpgradeTaskRunner\Api\TaskRunnerInterface;
-use TheFrosty\WpUpgradeTaskRunner\Exceptions\Exception;
 use TheFrosty\WpUtilities\Models\BaseModel;
 
 /**
@@ -13,11 +12,12 @@ use TheFrosty\WpUtilities\Models\BaseModel;
  */
 class UpgradeModel extends BaseModel implements UpgradeModelInterface
 {
-    const FIELD_DATE = 'date';
-    const FIELD_TITLE = 'title';
-    const FIELD_DESCRIPTION = 'description';
-    const FIELD_TASK_RUNNER = 'task_runner';
-    const REQUIRED_FIELDS = [
+
+    public const FIELD_DATE = 'date';
+    public const FIELD_TITLE = 'title';
+    public const FIELD_DESCRIPTION = 'description';
+    public const FIELD_TASK_RUNNER = 'task_runner';
+    private const REQUIRED_FIELDS = [
         self::FIELD_DATE,
         self::FIELD_TITLE,
         self::FIELD_DESCRIPTION,
@@ -56,12 +56,12 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
      * UpgradeModel constructor.
      *
      * @param array $fields Incoming fields.
-     * @throws Exception When the $fields array is missing required fields.
+     * @throws \TheFrosty\WpUpgradeTaskRunner\Exceptions\Exception When the $fields array is missing required fields.
      */
     public function __construct(array $fields)
     {
         if (!$this->hasRequiredFields($fields)) {
-            throw new Exception(
+            throw new \TheFrosty\WpUpgradeTaskRunner\Exceptions\Exception(
                 \sprintf('Required fields are missing: `%s`', \join(', ', $this->getRequiredFields()))
             );
         }
@@ -79,74 +79,47 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
         return ['date'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDate(): \DateTime
     {
         return $this->date;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDateFormat(string $format = DATE_ISO8601): string
+    public function getDateFormat(string $format = \DATE_ISO8601): string
     {
         return $this->date->format($format ?? \get_option('date_format'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDate(\DateTime $date)
+    public function setDate(\DateTime $date): void
     {
         $this->date = $date;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setTitle(string $title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTaskRunner(): TaskRunnerInterface
     {
         return $this->task_runner;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setTaskRunner(TaskRunnerInterface $task_runner)
+    public function setTaskRunner(TaskRunnerInterface $task_runner): void
     {
         $this->task_runner = $task_runner;
     }
@@ -187,9 +160,11 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
             try {
                 $constants = (new \ReflectionClass($this))->getConstants();
                 foreach ($constants as $constant => $value) {
-                    if (\in_array($value, self::REQUIRED_FIELDS, true)) {
-                        $fields[] = $value;
+                    if (!\in_array($value, self::REQUIRED_FIELDS, true)) {
+                        continue;
                     }
+
+                    $fields[] = $value;
                 }
             } catch (\ReflectionException $exception) {
                 $fields = [];

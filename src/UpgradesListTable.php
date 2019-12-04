@@ -12,9 +12,13 @@ use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModelFactory;
  *
  * @package TheFrosty\WpUpgradeTaskRunner
  * phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+ * phpcs:disable Generic.Commenting.DocComment.SpacingAfterTagGroup
+ * phpcs:disable SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+ * phpcs:disable SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
  */
 class UpgradesListTable extends \WP_List_Table
 {
+
     private const COLUMN_DATE = UpgradeModel::FIELD_DATE;
     private const COLUMN_TITLE = UpgradeModel::FIELD_TITLE;
     private const COLUMN_DESCRIPTION = UpgradeModel::FIELD_DESCRIPTION;
@@ -24,20 +28,23 @@ class UpgradesListTable extends \WP_List_Table
 
     /**
      * Array of data registered to be updated.
+     *
      * @var UpgradeModel[] $upgrade_models
      */
     private $upgrade_models = [];
 
     /**
      * Container object.
+     *
      * @var Container $container
      */
     private $container;
 
     /**
      * UpgradesListTable constructor.
-     * @see WP_List_Table::__construct()
+     *
      * @param Container $container
+     * @see WP_List_Table::__construct()
      */
     public function __construct(Container $container)
     {
@@ -51,38 +58,32 @@ class UpgradesListTable extends \WP_List_Table
 
     /**
      * Register a single update or migration to show in the upgrade list table.
+     *
      * @param array $fields Incoming fields.
      * @return $this
      */
     public function registerUpgrade(array $fields): UpgradesListTable
     {
-        $this->upgrade_models[] = $this->getUpgradeModelFactory()->createModel($fields);
+        $this->upgrade_models[] = UpgradeModelFactory::createModel($fields);
 
         return $this;
     }
 
     /**
      * Register multiple updates at once.
+     *
      * @param UpgradeModel[] $upgrades Array of UpgradeModel objects.
      */
-    public function registerUpgrades(array $upgrades)
+    public function registerUpgrades(array $upgrades): void
     {
-        \array_walk($upgrades, function (UpgradeModel $upgrade) {
+        \array_walk($upgrades, function (UpgradeModel $upgrade): void {
             $this->upgrade_models[] = $upgrade;
         });
     }
 
     /**
      * Return the UpgradeModelFactory object property.
-     * @return UpgradeModelFactory
-     */
-    protected function getUpgradeModelFactory(): UpgradeModelFactory
-    {
-        return $this->container[ServiceProvider::UPGRADE_MODEL_FACTORY];
-    }
-
-    /**
-     * Return the UpgradeModelFactory object property.
+     *
      * @return Request
      */
     protected function getHttpRequest(): Request
@@ -91,16 +92,8 @@ class UpgradesListTable extends \WP_List_Table
     }
 
     /**
-     * Return the UpgradeModelFactory object property.
-     * @return int
-     */
-    public function getUpgradeModelCount(): int
-    {
-        return \count($this->upgrade_models);
-    }
-
-    /**
      * Return the upgrades data.
+     *
      * @return UpgradeModel[]
      */
     public function getUpgradeModels(): array
@@ -112,15 +105,6 @@ class UpgradesListTable extends \WP_List_Table
     }
 
     /**
-     * Get the options.
-     * @return array
-     */
-    public function getOptions(): array
-    {
-        return $this->container[ServiceProvider::UPGRADE_PROVIDER]->getOptions();
-    }
-
-    /**
      * For more detailed insight into how columns are handled, take a look at
      * WP_List_Table::single_row_columns()
      *
@@ -128,46 +112,55 @@ class UpgradesListTable extends \WP_List_Table
      * @param string $column_name The name/slug of the column to be processed
      *
      * @return string Text or HTML to be placed inside the column <td>
-     * phpcs:disable Inpsyde.CodeQuality.ArgumentTypeDeclaration.NoArgumentType
      */
     public function column_default($item, $column_name): string
     {
         switch ($column_name) {
             case self::COLUMN_DATE:
                 return $item->getDate()->format(\get_option('date_format'));
-
             case self::COLUMN_DESCRIPTION:
                 return $this->buildDescription($item);
-
             case self::COLUMN_EXECUTED:
-                $options = $this->getOptions();
+                $options = Option::getOptions();
+                $key = Option::getOptionKey($item);
+                if (empty($options[$key])) {
+                    return '<span class="dashicons dashicons-no"></span>';
+                }
+                $date = !empty($options[$key][Option::SETTING_DATE]) ?
+                    $options[$key][Option::SETTING_DATE] : $options[$key];
+                $user = !empty($options[$key][Option::SETTING_USER]) ?
+                    \get_user_by('ID', $options[$key][Option::SETTING_USER]) : null;
 
-                return empty($options[\sanitize_title($item->getTitle())]) ?
-                    '<span class="dashicons dashicons-no"></span>' :
+                return \sprintf(
+                    '<span title="%s" class="dashicons dashicons-yes"></span>',
                     \sprintf(
-                        '<span title="%s" class="dashicons dashicons-yes"></span>',
-                        \sprintf(
-                            '%s was run on %s',
-                            $item->getTitle(),
-                            $options[\sanitize_title($item->getTitle())]
-                        )
-                    );
+                        '%s was run on %s by %s',
+                        $item->getTitle(),
+                        $date,
+                        $user instanceof \WP_User ? $user->user_login : 'N/A',
+                    )
+                );
         }
 
         return '';
     }
 
     /**
-     * @see WP_List_Table::::single_row_columns()
+     * The title column.
+     *
      * @param UpgradeModel $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td>
+     *
      * phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
      * phpcs:disable WordPress.VIP.ValidatedSanitizedInput.InputNotValidated
-     * @throws
+     * @see WP_List_Table::::single_row_columns()
+     * @throws \Exception An \Exception.
      */
     public function column_title(UpgradeModel $item): string
     {
         $request = $this->getHttpRequest();
+        $options = Option::getOptions();
+        $key = Option::getOptionKey($item);
         // Build row actions
         $actions = [
             'run' => \sprintf(
@@ -195,18 +188,22 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
 
         if ($request->query->has('item') && $request->query->get('item') === $item->getTitle()) {
             $actions = ['run' => '<a href="javascript:void(0)">Running...</a>'];
-        } elseif (!empty($this->getOptions()[\sanitize_title($item->getTitle())])) {
-            $completed = $this->getOptions()[\sanitize_title($item->getTitle())];
-            $datetime = (new \DateTime($completed, new \DateTimeZone('UTC')));
+        } elseif (!empty($options[$key])) {
+            $date = !empty($options[$key][Option::SETTING_DATE]) ? $options[$key][Option::SETTING_DATE] : $options[$key];
+            $datetime = (new \DateTime($date, new \DateTimeZone('UTC')));
+            $user = !empty($options[$key][Option::SETTING_USER]) ?
+                \get_user_by('ID', $options[$key][Option::SETTING_USER]) : null;
+
             $actions = [
                 'run' => \sprintf(
-                    '<a href="javascript:void(0)">%s</a> on %s',
+                    '<a href="javascript:void(0)">%s</a> on %s by %s',
                     \esc_html__('Completed', 'wp-upgrade-task-runner'),
                     \sprintf(
                         '<time datetime="%s">%s</time>',
                         $datetime->format(\DateTime::ISO8601),
                         $datetime->setTimeZone(new \DateTimeZone($this->wpGetTimezoneString()))->format('l, M d, Y h:i:s T')
-                    )
+                    ),
+                    $user instanceof \WP_User ? $user->user_login : 'N/A'
                 ),
             ];
         }
@@ -219,16 +216,17 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
      * The 'cb' column is treated differently than the rest. If including a checkbox
      * column in your table you must create a column_cb() method. If you don't need
      * bulk actions or checkboxes, simply leave the 'cb' entry out of your array.
-     * @see WP_List_Table::::single_row_columns()
+     *
      * @return array An associative array containing column information: 'slugs'=>'Visible Titles'
+     * @see WP_List_Table::::single_row_columns()
      */
     public function get_columns(): array
     {
         return [
-            self::COLUMN_DATE => __('Date'),
-            self::COLUMN_TITLE => __('Title'),
-            self::COLUMN_DESCRIPTION => __('Description'),
-            self::COLUMN_EXECUTED => __('Executed'),
+            self::COLUMN_DATE => \__('Date', 'wp-upgrade-task-runner'),
+            self::COLUMN_TITLE => \__('Title', 'wp-upgrade-task-runner'),
+            self::COLUMN_DESCRIPTION => \__('Description', 'wp-upgrade-task-runner'),
+            self::COLUMN_EXECUTED => \__('Executed', 'wp-upgrade-task-runner'),
         ];
     }
 
@@ -237,6 +235,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
      * clickable - it does not handle the actual sorting. You still need to detect
      * the ORDERBY and ORDER querystring variables within prepare_items() and sort
      * your data accordingly (usually by modifying your query).
+     *
      * @return array An associative array containing all the columns that should be sortable:
      *               'slugs'=>array('data_values',bool)
      */
@@ -252,12 +251,14 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
 
     /**
      * Prepare the output of the items to the page.
+     *
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
      * @uses $this->get_sortable_columns()
      * @uses $this->get_pagenum()
      * @uses $this->set_pagination_args()
+     * phpcs:disable SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
      */
     public function prepare_items()
     {
@@ -282,6 +283,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
      * to handle sorting by passing the 'orderby' and 'order' values directly
      * to a custom query. The returned data will be pre-sorted, and this array
      * sorting technique would be unnecessary.
+     *
      * @param UpgradeModel $model1
      * @param UpgradeModel $model2
      * @return int
@@ -295,7 +297,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
         $order = $request->query->has('order') ? \esc_attr(\wp_unslash($request->query->get('order'))) : 'desc';
         $result = \strcmp($model1->getDateFormat('c'), $model2->getDateFormat('c'));
 
-        return $order === 'asc' ? $result : -$result; // Send final sort direction to usort
+        return \strtolower($order) === 'asc' ? $result : -$result; // Send final sort direction to usort
     }
 
     /**
@@ -304,6 +306,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
      * concatenate it and return a shortened string with a link to an overlay to read the whole
      * thing.
      * @ref https://gist.github.com/anttiviljami/3cdefd6b5556d80426e66f131a42bef1
+     *
      * @param UpgradeModel $item A singular item (one full row's worth of data)
      * @return string
      */
@@ -311,7 +314,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
     {
         if (\strlen($item->getDescription()) >= self::DESCRIPTION_CONCATENATION_LENGTH) {
             $dialog_id = \sprintf('upgrade-task-dialog-%s', \sanitize_title($item->getTitle()));
-            \add_action('admin_footer', function () use ($item, $dialog_id) {
+            \add_action('admin_footer', static function () use ($item, $dialog_id): void {
                 ?>
                 <div id="<?php echo \sanitize_html_class($dialog_id); ?>" class="hidden" style="max-width:800px">
                     <h3><?php echo \esc_html($item->getTitle()); ?></h3>
@@ -337,6 +340,7 @@ data-id="#%1$s" title="%2$s">%2$s</a>',
 
     /**
      * Returns the timezone string for a site, even if it's set to a UTC offset.
+     *
      * @link https://developer.wordpress.org/reference/functions/wp_timezone_string/
      * @uses wp_timezone_string() WordPress >= 5.3
      *
@@ -356,9 +360,8 @@ data-id="#%1$s" title="%2$s">%2$s</a>',
         $hours = (int)$offset;
         $minutes = ($offset - $hours);
 
-        $sign = ($offset < 0) ? '-' : '+';
-        $tz_offset = \sprintf('%s%02d:%02d', $sign, \abs($hours), \abs($minutes * 60));
+        $sign = $offset < 0 ? '-' : '+';
 
-        return $tz_offset;
+        return \sprintf('%s%02d:%02d', $sign, \abs($hours), \abs($minutes * 60));
     }
 }

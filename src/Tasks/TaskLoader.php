@@ -5,6 +5,7 @@ namespace TheFrosty\WpUpgradeTaskRunner\Tasks;
 use TheFrosty\WpUpgradeTaskRunner\Api\TaskRunnerInterface;
 use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
 use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModelFactory;
+use TheFrosty\WpUpgradeTaskRunner\Option;
 use TheFrosty\WpUpgradeTaskRunner\Upgrade;
 use TheFrosty\WpUpgradeTaskRunner\UpgradesListTable;
 use TheFrosty\WpUtilities\Plugin\HooksTrait;
@@ -16,6 +17,7 @@ use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
  */
 class TaskLoader implements \IteratorAggregate, WpHooksInterface
 {
+
     use HooksTrait;
 
     public const REGISTER_TASKS_TAG = 'wp_upgrade_task_runner/register_tasks';
@@ -39,24 +41,9 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
     private $tasks = [];
 
     /**
-     * UpgradeModelFactory object.
-     * @var UpgradeModelFactory $model_factory
-     */
-    private $model_factory;
-
-    /**
-     * TaskLoader constructor.
-     * @param UpgradeModelFactory $model_factory
-     */
-    public function __construct(UpgradeModelFactory $model_factory)
-    {
-        $this->model_factory = $model_factory;
-    }
-
-    /**
      * Create the actions.
      */
-    public function addHooks()
+    public function addHooks(): void
     {
         $this->addAction('plugins_loaded', [$this, 'registerTasks'], 12);
         $this->addAction('plugins_loaded', [$this, 'registerTasksListeners'], 14);
@@ -78,7 +65,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      * Register the screen ID.
      * @param string $screen_id
      */
-    public function registerScreenId(string $screen_id)
+    public function registerScreenId(string $screen_id): void
     {
         $this->screen_id = $screen_id;
     }
@@ -95,24 +82,33 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
     /**
      * Register all task objects on wp_loaded.
      */
-    protected function registerTasks()
+    protected function registerTasks(): void
     {
         $tasks = (array)\apply_filters(self::REGISTER_TASKS_TAG, []);
-        \array_walk($tasks, function ($task) {
-            if ($task instanceof TaskRunnerInterface) {
-                $this->tasks[] = $task;
+        \array_walk($tasks, function ($task): void {
+            if (!($task instanceof TaskRunnerInterface)) {
+                return;
             }
+
+            $this->tasks[] = $task;
         });
     }
 
     /**
      * Create the action listener for all tasks based on their class name to dispatch their
-     * actions.
+     * actions. Be sure that no tasks which have been saved into the DB run again.
      */
-    protected function registerTasksListeners()
+    protected function registerTasksListeners(): void
     {
+        $options = Option::getOptions();
+        $tasks = \array_column($options, Option::SETTING_TASK_RUNNER);
         foreach ($this->getTaskRunnerObjects() as $task_runner) {
-            \add_action(\get_class($task_runner), [$task_runner, 'dispatch']);
+            $tag = \get_class($task_runner);
+            if (\array_key_exists(\esc_attr($tag), $tasks)) {
+                continue;
+            }
+
+            \add_action($tag, [$task_runner, 'dispatch']);
         }
     }
 
@@ -120,11 +116,11 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      * Register our fields array of objects. This is called early so we can calculate the number of
      * upgrades that need to be run to show a count in the menu.
      */
-    protected function registerFields()
+    protected function registerFields(): void
     {
         $fields = $this->getTaskRunnerArray();
-        \array_walk($fields, function (array $args, string $key) use (&$fields) {
-            $fields[$key] = $this->model_factory->createModel($args);
+        \array_walk($fields, static function (array $args, string $key) use (&$fields): void  {
+            $fields[$key] = UpgradeModelFactory::createModel($args);
         });
 
         $this->setFields($fields);
@@ -134,12 +130,14 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      * Un-instantiate the TaskRunner objects if we aren't on our settings page.
      * @param \WP_Screen $screen
      */
-    protected function currentScreenCheck(\WP_Screen $screen)
+    protected function currentScreenCheck(\WP_Screen $screen): void
     {
-        if ($screen !== $this->screen_id) {
-            foreach ($this->getTaskRunnerObjects() as $task_runner) {
-                unset($task_runner);
-            }
+        if ($screen === $this->screen_id) {
+            return;
+        }
+
+        foreach ($this->getTaskRunnerObjects() as $task_runner) {
+            unset($task_runner);
         }
     }
 
@@ -147,7 +145,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      * Register the upgrades to the upgrade list table.
      * @param UpgradesListTable $list_table UpgradesListTable object passed in on the action.
      */
-    protected function registerUpgradeTasksList(UpgradesListTable $list_table)
+    protected function registerUpgradeTasksList(UpgradesListTable $list_table): void
     {
         $list_table->registerUpgrades($this->fields);
     }
@@ -156,7 +154,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      * Set the fields array.
      * @param array $fields
      */
-    private function setFields(array $fields)
+    private function setFields(array $fields): void
     {
         $this->fields = $fields;
     }
@@ -172,10 +170,13 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
         }
 
         foreach ($this as $task) {
-            if ($task instanceof TaskRunnerInterface) {
-                $tasks[] = $task;
+            if (!($task instanceof TaskRunnerInterface)) {
+                continue;
             }
+
+            $tasks[] = $task;
         }
+
         return $tasks ?? [];
     }
 
@@ -187,7 +188,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
     private function getTaskRunnerArray(): array
     {
         $fields = $this->getTaskRunnerObjects();
-        \array_walk($fields, function (TaskRunnerInterface $runner, string $key) use (&$fields) {
+        \array_walk($fields, static function (TaskRunnerInterface $runner, string $key) use (&$fields): void  {
             $fields[$key] = [
                 UpgradeModel::FIELD_DATE => $runner::DATE,
                 UpgradeModel::FIELD_TITLE => $runner::TITLE,

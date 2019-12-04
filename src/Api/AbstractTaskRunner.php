@@ -3,95 +3,89 @@
 namespace TheFrosty\WpUpgradeTaskRunner\Api;
 
 use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
-use TheFrosty\WpUpgradeTaskRunner\Upgrade;
+use TheFrosty\WpUpgradeTaskRunner\Option;
 
 /**
  * Class TaskRunner
  *
  * @package TheFrosty\WpUpgradeTaskRunner\Api
+ * phpcs:disable SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming.SuperfluousPrefix
  */
 abstract class AbstractTaskRunner implements TaskRunnerInterface
 {
+
     /**
-     * Array of args to pass to the event.
+     * Dispatch the migration task.
      *
-     * @var UpgradeModel[] $args
+     * @param UpgradeModel $model
      */
-    private $args = [];
+    abstract public function dispatch(UpgradeModel $model): void;
 
     /**
-     * {@inheritdoc}
-     */
-    abstract public function dispatch(UpgradeModel $model);
-
-    /**
-     * {@inheritdoc}
+     * Trigger events when the task is complete.
+     *
+     * @param UpgradeModel $model
+     * @return bool
      */
     public function complete(UpgradeModel $model): bool
     {
-        $this->args = [];
-        $options = \get_option(Upgrade::OPTION_NAME, []);
-        if (empty($options[\sanitize_title($model->getTitle())])) {
-            $options[\sanitize_title($model->getTitle())] = $this->getDate();
+        $options = Option::getOptions();
+        $key = Option::getOptionKey($model);
+        if (empty($options[$key])) {
+            $options[$key] = [
+                Option::SETTING_DATE => $this->getDate(),
+                Option::SETTING_TASK_RUNNER => \esc_attr(static::class),
+                Option::SETTING_USER => \get_current_user_id(),
+            ];
         }
 
-        return \update_option(Upgrade::OPTION_NAME, $options, true);
+        return Option::updateOption($options);
     }
 
     /**
-     * {@inheritdoc}
+     * Schedule a one off cron event.
+     *
+     * @param string $class The fully-qualified class-name to register as a cron hook.
+     * @param UpgradeModel $model Arguments to pass to the hook's callback function.
      * @uses wp_schedule_single_event()
      */
-    public function scheduleEvent(string $class, array $args = [])
+    public function scheduleEvent(string $class, UpgradeModel $model): void
     {
-        $this->args = $args;
-        \wp_schedule_single_event(\strtotime('+5 seconds'), $class, $args);
+        \wp_schedule_single_event(\strtotime('+5 seconds'), $class, [$model]);
     }
 
     /**
-     * {@inheritdoc}
+     * Clear the one off scheduled cron event, in-case it isn't cleared automatically.
+     *
+     * @param string $class The fully-qualified class-name to register as a cron hook.
+     * @param UpgradeModel $model Arguments to pass to the hook's callback function.
      * @uses wp_clear_scheduled_hook()
      * @uses wp_next_scheduled()
      * @uses wp_unschedule_event()
      */
-    public function clearScheduledEvent(string $class)
+    public function clearScheduledEvent(string $class, UpgradeModel $model): void
     {
-        \wp_clear_scheduled_hook($class, $this->args);
-        $timestamp = \wp_next_scheduled($class, $this->args);
+        \wp_clear_scheduled_hook($class, [$model]);
+        $timestamp = \wp_next_scheduled($class, [$model]);
 
         if (\is_int($timestamp)) {
-            \wp_unschedule_event($timestamp, $class, $this->args);
+            \wp_unschedule_event($timestamp, $class, [$model]);
+        } else {
+            \wp_unschedule_event(\time(), $class, [$model]);
         }
     }
 
     /**
-     * Return a new WP_Query object.
-     * @param string $post_type The post type to query
-     * @param array $args Additional WP_Query parameters
-     * @return \WP_Query
-     */
-    protected function wpQuery(string $post_type, array $args = []): \WP_Query
-    {
-        $defaults = [
-            'post_type' => $post_type,
-            'posts_per_page' => 1000,
-            'post_status' => 'any',
-            'ignore_sticky_posts' => true,
-            'no_found_rows' => true,
-        ];
-        return new \WP_Query(\wp_parse_args($args, $defaults));
-    }
-
-    /**
      * Get a date formatted string.
+     *
      * @return string
      */
     private function getDate(): string
     {
         try {
             return (new \DateTime('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC850);
-        } catch (\Exception $exception) {
-            return (date_create('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC850);
+        } catch (\Throwable $exception) {
+            return \date_create('now', new \DateTimeZone('UTC'))->format(\DateTime::RFC850);
         }
     }
 }

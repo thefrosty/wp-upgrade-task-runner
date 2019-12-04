@@ -11,6 +11,7 @@ use TheFrosty\WpUpgradeTaskRunner\Api\TaskRunnerInterface;
  */
 interface UpgradeModelInterface
 {
+
     /**
      * Get the DateTime object of the upgrade date.
      * This is the date the upgrade was created (not run).
@@ -26,7 +27,7 @@ interface UpgradeModelInterface
      * @param string $format Defaults to `DATE_ISO8601`.
      * @return string
      */
-    public function getDateFormat(string $format = DATE_ISO8601): string;
+    public function getDateFormat(string $format = \DATE_ISO8601): string;
 
     /**
      * Sets the the upgrade was created (not run). When passing the value from the array, use a
@@ -35,7 +36,7 @@ interface UpgradeModelInterface
      * @param \DateTime $date Date in the format of a string value that the `AbstractBaseModel` will convert
      *      into a DateTime object, or a DateTime object.
      */
-    public function setDate(\DateTime $date);
+    public function setDate(\DateTime $date): void;
 
     /**
      * Get the title of the migration/upgrade.
@@ -49,7 +50,7 @@ interface UpgradeModelInterface
      *
      * @param string $title The migration/upgrade title.
      */
-    public function setTitle(string $title);
+    public function setTitle(string $title): void;
 
     /**
      * Get the description of the migration/upgrade.
@@ -63,7 +64,7 @@ interface UpgradeModelInterface
      *
      * @param string $description Migration or Upgrade description.
      */
-    public function setDescription(string $description);
+    public function setDescription(string $description): void;
 
     /**
      * Get the migration/upgrade callback.
@@ -77,5 +78,5 @@ interface UpgradeModelInterface
      *
      * @param TaskRunnerInterface $task_runner Migration or Upgrade callback.
      */
-    public function setTaskRunner(TaskRunnerInterface $task_runner);
+    public function setTaskRunner(TaskRunnerInterface $task_runner): void;
 }

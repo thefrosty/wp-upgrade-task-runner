@@ -51,7 +51,6 @@ class WpUnitTestCase extends WP_UnitTestCase
      * @param object $argument
      *
      * @return \ReflectionObject
-     * phpcs:disable Inpsyde.CodeQuality.ArgumentTypeDeclaration.NoArgumentType
      */
     protected function getReflection($argument): \ReflectionObject
     {
