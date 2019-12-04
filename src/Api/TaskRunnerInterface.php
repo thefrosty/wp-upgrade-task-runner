@@ -11,6 +11,7 @@ use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
  */
 interface TaskRunnerInterface
 {
+
     const DATE = null;
     const DESCRIPTION = null;
     const TITLE = null;
@@ -20,7 +21,7 @@ interface TaskRunnerInterface
      *
      * @param UpgradeModel $model
      */
-    public function dispatch(UpgradeModel $model);
+    public function dispatch(UpgradeModel $model): void;
 
     /**
      * Trigger events when the task is complete.
@@ -34,14 +35,15 @@ interface TaskRunnerInterface
      * Schedule a one off cron event.
      *
      * @param string $class The fully-qualified class-name to register as a cron hook.
-     * @param array $args Optional. Arguments to pass to the hook's callback function.
+     * @param UpgradeModel $model Arguments to pass to the hook's callback function.
      */
-    public function scheduleEvent(string $class, array $args = []);
+    public function scheduleEvent(string $class, UpgradeModel $model): void;
 
     /**
      * Clear the one off scheduled cron event, in-case it isn't cleared automatically.
      *
      * @param string $class The fully-qualified class-name to register as a cron hook.
+     * @param UpgradeModel $model Arguments to pass to the hook's callback function.
      */
-    public function clearScheduledEvent(string $class);
+    public function clearScheduledEvent(string $class, UpgradeModel $model): void;
 }
