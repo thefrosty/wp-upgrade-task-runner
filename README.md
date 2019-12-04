@@ -1,5 +1,7 @@
 # WordPress Upgrade Task Runner
 
+![WP Upgrade Task Runner](.github/wp-upgrade-task-runner.jpg?raw=true "Upgrade Task Runner")
+
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/thefrosty/wp-upgrade-task-runner.svg)]()
 [![Latest Stable Version](https://img.shields.io/packagist/v/thefrosty/wp-upgrade-task-runner.svg)](https://packagist.org/packages/thefrosty/wp-upgrade-task-runner)
 [![Total Downloads](https://img.shields.io/packagist/dt/thefrosty/wp-upgrade-task-runner.svg)](https://packagist.org/packages/thefrosty/wp-upgrade-task-runner)
