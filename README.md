@@ -13,7 +13,7 @@ Register custom migration tasks that can be triggered from a dashboard in the ad
 
 ```
 PHP >= 7.3
-WordPress >= 5.3
+WordPress >= 5.1
 ```
 
 The required WordPress version will always be the most recent point release of
