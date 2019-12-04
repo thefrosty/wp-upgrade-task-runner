@@ -85,10 +85,12 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
     protected function registerTasks(): void
     {
         $tasks = (array)\apply_filters(self::REGISTER_TASKS_TAG, []);
-        \array_walk($tasks, function ($task) {
-            if ($task instanceof TaskRunnerInterface) {
-                $this->tasks[] = $task;
+        \array_walk($tasks, function ($task): void {
+            if (!($task instanceof TaskRunnerInterface)) {
+                return;
             }
+
+            $this->tasks[] = $task;
         });
     }
 
@@ -102,9 +104,11 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
         $tasks = \array_column($options, Option::SETTING_TASK_RUNNER);
         foreach ($this->getTaskRunnerObjects() as $task_runner) {
             $tag = \get_class($task_runner);
-            if (!\array_key_exists(\esc_attr($tag), $tasks)) {
-                \add_action($tag, [$task_runner, 'dispatch']);
+            if (\array_key_exists(\esc_attr($tag), $tasks)) {
+                continue;
             }
+
+            \add_action($tag, [$task_runner, 'dispatch']);
         }
     }
 
@@ -115,7 +119,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
     protected function registerFields(): void
     {
         $fields = $this->getTaskRunnerArray();
-        \array_walk($fields, function (array $args, string $key) use (&$fields): void  {
+        \array_walk($fields, static function (array $args, string $key) use (&$fields): void  {
             $fields[$key] = UpgradeModelFactory::createModel($args);
         });
 
@@ -128,10 +132,12 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      */
     protected function currentScreenCheck(\WP_Screen $screen): void
     {
-        if ($screen !== $this->screen_id) {
-            foreach ($this->getTaskRunnerObjects() as $task_runner) {
-                unset($task_runner);
-            }
+        if ($screen === $this->screen_id) {
+            return;
+        }
+
+        foreach ($this->getTaskRunnerObjects() as $task_runner) {
+            unset($task_runner);
         }
     }
 
@@ -164,9 +170,11 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
         }
 
         foreach ($this as $task) {
-            if ($task instanceof TaskRunnerInterface) {
-                $tasks[] = $task;
+            if (!($task instanceof TaskRunnerInterface)) {
+                continue;
             }
+
+            $tasks[] = $task;
         }
 
         return $tasks ?? [];
