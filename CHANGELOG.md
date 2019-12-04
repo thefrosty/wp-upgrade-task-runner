@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [2.0.0] - 2019-12-03
 ## Breaking changes
 - **Bump PHP requirement >= 7.3**.
-- **Bump WordPress requirement >= 5.0**.
+- **Bump WordPress requirement >= 5.1**.
 ### Updates
 - Update the PHP and WordPress versions in Travis.
 - Remove the PHPMD library.

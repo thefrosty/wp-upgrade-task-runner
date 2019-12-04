@@ -9,7 +9,7 @@
  * Version: 2.0.0
  * Author: Austin Passy
  * Author URI: https://github.com/thefrosty
- * Requires at least: 5.0
+ * Requires at least: 5.1
  * Tested up to: 5.2
  * Requires PHP: 7.3
  *
