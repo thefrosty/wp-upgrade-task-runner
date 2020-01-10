@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.1.0] - 2020-01-09
+### Updates
+- Added wp-cli command to run all registered tasks not already run.
+    * Use `$ wp wp-upgrade-task-runner`
+
 ## [2.0.0] - 2019-12-03
 ## Breaking changes
 - **Bump PHP requirement >= 7.3**.

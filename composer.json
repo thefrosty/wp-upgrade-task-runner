@@ -16,9 +16,7 @@
   },
   "config": {
     "sort-packages": true,
-    "preferred-install": "dist",
-    "optimize-autoloader": true,
-    "vendor-dir": "vendor"
+    "optimize-autoloader": true
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
@@ -31,11 +29,11 @@
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3",
     "phpcompatibility/php-compatibility": "^9.3",
-    "phpunit/phpunit": "^7",
+    "phpunit/phpunit": "^6|^7",
     "slevomat/coding-standard": "^4",
     "squizlabs/php_codesniffer": "^3.2",
-    "wp-coding-standards/wpcs": "^2.2",
-    "wp-phpunit/wp-phpunit": "^5.1"
+    "wp-cli/wp-cli-bundle": "^2.4",
+    "wp-phpunit/wp-phpunit": "^5"
   },
   "autoload": {
     "psr-4": {

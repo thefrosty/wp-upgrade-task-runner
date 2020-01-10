@@ -1,5 +1,7 @@
 # WordPress Upgrade Task Runner
 
+![WP Upgrade Task Runner](.github/wp-upgrade-task-runner.jpg?raw=true "Upgrade Task Runner")
+
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/thefrosty/wp-upgrade-task-runner.svg)]()
 [![Latest Stable Version](https://img.shields.io/packagist/v/thefrosty/wp-upgrade-task-runner.svg)](https://packagist.org/packages/thefrosty/wp-upgrade-task-runner)
 [![Total Downloads](https://img.shields.io/packagist/dt/thefrosty/wp-upgrade-task-runner.svg)](https://packagist.org/packages/thefrosty/wp-upgrade-task-runner)
@@ -47,12 +49,16 @@ use TheFrosty\WpUpgradeTaskRunner\Tasks\TaskLoader;
 });
 ```
 
-### The task class.
+### The task class
 
 When a class is added, it needs to have a few pre-defined class values. Both the DATE and TITLE constant are required
 to be unique. These are what registers a one off cron task when manually _running_ the task from the admin page.
 
-### The `TaskLoader`.
+### The `TaskLoader`
 
 Add the new class as a property in the `TaskLoader` class and instantiate it in the `register_tasks` method (just like
 the `ExampleMigrationTask`).
+
+### CLI
+
+Run all registered tasks (not already run) via wp-cli: `$ wp wp-upgrade-task-runner`.
