@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.1.1] - 2020-01-31
+### Fixes
+- Fix inconsistencies with WordPress' do_action modifying the args passed in as an array of objects into 
+the object when the array count is only 1.
+
 ## [2.1.0] - 2020-01-09
 ### Updates
 - Added wp-cli command to run all registered tasks not already run.
