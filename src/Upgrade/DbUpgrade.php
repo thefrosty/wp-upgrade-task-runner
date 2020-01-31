@@ -45,10 +45,11 @@ class DbUpgrade implements WpHooksInterface
     }
 
     /**
-     * @param UpgradeModel[] $models
+     * Update the DB.
+     * @param UpgradeModel[]|UpgradeModel $models
      * @param Request $request
      */
-    protected function updateSettings(array $models, Request $request): void
+    protected function updateSettings($models, Request $request): void
     {
         $this->models = $models;
         $this->request = $request;
