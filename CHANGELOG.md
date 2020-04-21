@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.1.2] - 2020-04-21
+- Update Symfony HTTP Foundation
+
 ## [2.1.1] - 2020-01-31
 ### Fixes
 - Fix inconsistencies with WordPress' do_action modifying the args passed in as an array of objects into 
