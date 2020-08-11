@@ -35,7 +35,7 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
             $options[$key] = [
                 Option::SETTING_DATE => $this->getDate(),
                 Option::SETTING_TASK_RUNNER => \esc_attr(static::class),
-                Option::SETTING_USER => \get_current_user_id(),
+                Option::SETTING_USER => $model->getUserId(),
             ];
         }
 
@@ -44,6 +44,7 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
 
     /**
      * Schedule a one off cron event.
+     * Make sure it's not already scheduled.
      *
      * @param string $class The fully-qualified class-name to register as a cron hook.
      * @param UpgradeModel $model Arguments to pass to the hook's callback function.
@@ -51,7 +52,9 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
      */
     public function scheduleEvent(string $class, UpgradeModel $model): void
     {
-        \wp_schedule_single_event(\strtotime('+5 seconds'), $class, [$model]);
+        if (!\wp_next_scheduled($class, [$model])) {
+            \wp_schedule_single_event(\strtotime('now'), $class, [$model]);
+        }
     }
 
     /**
