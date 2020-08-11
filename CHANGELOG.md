@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.2.0] - 2020-08-10
+- Bumped "Requires at least" to WordPress 5.4.
+- Bumped "tested up to" to WordPress 5.5.
+- JS should now show event scheduled after clicking "run".
+- If deprecated or old tasks are removed from registration but exist in the DB, a new cleanup task can be run.
+- Add public method for `UpgradesListTable` in `TaskRunner\Upgrade`.
+   * Change response on AJAX action to include scheduled cron event object data (passed to JS). 
+   * Allow negative task count to show warning and allow internal re-count task (notice count).
+- Move shared "upgrade" code into abstraction.
+   * Introduce new task count upgrade class for when old tasks are removed from the codebase but exist in the DB.
+
 ## [2.1.2] - 2020-04-21
 - Update Symfony HTTP Foundation
 
