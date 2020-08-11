@@ -25,6 +25,9 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     public const OPTION_NAME = 'wp_upgrade_task_runner';
     private const NONCE_KEY = 'task_runner_migration_upgrades_nonce_%s';
     public const TAG_SETTINGS_PAGE_LOADED = 'wp_upgrade_task_runner/settings_page_loaded';
+    public const TAG_VIEW_SETTINGS_PAGE_CAP = 'wp_upgrade_task_runner/view_settings_page_cap';
+    public const TAG_UPGRADE_TASKS_CAP = 'wp_upgrade_task_runner/upgrade_tasks_cap';
+
 
     /**
      * Container object.
@@ -102,7 +105,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
         $this->settings_page = \add_dashboard_page(
             \esc_html__('Data Migration &amp; Upgrade Tasks', 'wp-upgrade-task-runner'),
             \sprintf(\__('Migration Tasks %s', 'wp-upgrade-task-runner'), $this->getUpgradeCountHtml()),
-            'promote_users',
+            \apply_filters(self::TAG_VIEW_SETTINGS_PAGE_CAP, 'list_users'),
             self::MENU_SLUG,
             function (): void {
                 include $this->getPlugin()->getPath('/views/wp-admin/settings-pages/upgrades.php');
