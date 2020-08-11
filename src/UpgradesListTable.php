@@ -123,7 +123,15 @@ class UpgradesListTable extends \WP_List_Table
             case self::COLUMN_EXECUTED:
                 $options = Option::getOptions();
                 $key = Option::getOptionKey($item);
-                if (empty($options[$key])) {
+                // Is the event scheduled? Edge case where someone refreshed before cron has run..
+                $scheduled = \wp_next_scheduled(\get_class($item->getTaskRunner()), [$item]);
+                if ($scheduled !== false) {
+                    return \sprintf(
+                        '<span class="dashicons dashicons-clock" title="%s %s"></span>',
+                        \esc_html__('Scheduled for', 'wp-upgrade-task-runner'),
+                        \esc_attr(\human_time_diff($scheduled))
+                    );
+                } elseif (empty($options[$key])) {
                     return '<span class="dashicons dashicons-no"></span>';
                 }
                 $date = !empty($options[$key][Option::SETTING_DATE]) ?
@@ -137,7 +145,7 @@ class UpgradesListTable extends \WP_List_Table
                         '%s was run on %s by %s',
                         $item->getTitle(),
                         $date,
-                        $user instanceof \WP_User ? $user->user_login : 'N/A',
+                        $user instanceof \WP_User ? $user->user_login : \esc_html__('N/A', 'wp-upgrade-task-runner'),
                     )
                 );
         }
@@ -161,6 +169,8 @@ class UpgradesListTable extends \WP_List_Table
         $request = $this->getHttpRequest();
         $options = Option::getOptions();
         $key = Option::getOptionKey($item);
+        // Is the event scheduled? Edge case where someone refreshed before cron has run..
+        $scheduled = \wp_next_scheduled(\get_class($item->getTaskRunner()), [$item]);
         // Build row actions
         $actions = [
             'run' => \sprintf(
@@ -186,7 +196,9 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
             ),
         ];
 
-        if ($request->query->has('item') && $request->query->get('item') === $item->getTitle()) {
+        if ($scheduled !== false) {
+            $actions = ['run' => '<a href="javascript:void(0)">Scheduled...</a>'];
+        } elseif ($request->query->has('item') && $request->query->get('item') === $item->getTitle()) {
             $actions = ['run' => '<a href="javascript:void(0)">Running...</a>'];
         } elseif (!empty($options[$key])) {
             $date = !empty($options[$key][Option::SETTING_DATE]) ? $options[$key][Option::SETTING_DATE] : $options[$key];
@@ -203,7 +215,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
                         $datetime->format(\DateTime::ISO8601),
                         $datetime->setTimeZone(new \DateTimeZone($this->wpGetTimezoneString()))->format('l, M d, Y h:i:s T')
                     ),
-                    $user instanceof \WP_User ? $user->user_login : 'N/A'
+                    $user instanceof \WP_User ? $user->user_login : \esc_html__('N/A', 'wp-upgrade-task-runner')
                 ),
             ];
         }
