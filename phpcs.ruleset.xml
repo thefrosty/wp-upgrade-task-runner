@@ -22,7 +22,7 @@
     <!-- For CI, don't fail on warnings -->
     <config name="ignore_warnings_on_exit" value="1"/>
     <!-- Sets the minimum supported WP version to 5.1. -->
-    <config name="minimum_supported_wp_version" value="5.1" />
+    <config name="minimum_supported_wp_version" value="5.4" />
 
     <rule ref="WordPress-Docs">
         <exclude name="Generic.Commenting.DocComment.SpacingBeforeTags"/>
