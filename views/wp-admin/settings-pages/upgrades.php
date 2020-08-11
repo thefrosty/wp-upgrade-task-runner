@@ -4,24 +4,14 @@ use TheFrosty\WpUpgradeTaskRunner\Upgrade;
 
 /**
  * Upgrade object.
+ * phpcs:disable SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions.NonFullyQualified
  * @var $this Upgrade
  */
 if (!($this instanceof Upgrade)) {
     wp_die(sprintf('Please don\'t load this file outside of <code>%s.</code>', esc_attr(Upgrade::class)));
 }
 
-try {
-    $property = (new ReflectionObject($this))->getProperty('list_table');
-    $property->setAccessible(true);
-} catch (ReflectionException $exception) {
-    wp_die($exception->getMessage());
-}
-
-/**
- * UpgradesListTable object.
- * @var TheFrosty\WpUpgradeTaskRunner\UpgradesListTable $list_table
- */
-$list_table = $property->getValue($this);
+$list_table = $this->getListTable();
 ?>
 <div class="wrap">
     <h2>
