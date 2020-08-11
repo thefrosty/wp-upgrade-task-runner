@@ -53,6 +53,20 @@ interface UpgradeModelInterface
     public function setTitle(string $title): void;
 
     /**
+     * Get the user ID who initiated the task.
+     *
+     * @return int
+     */
+    public function getUserId(): int;
+
+    /**
+     * The user ID who initiated the task.
+     *
+     * @param int $user_id The user ID.
+     */
+    public function setUserId(int $user_id): void;
+
+    /**
      * Get the description of the migration/upgrade.
      *
      * @return string
