@@ -81,6 +81,15 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
     }
 
     /**
+     * Get the UpgradesListTable object.
+     * @return UpgradesListTable
+     */
+    public function getListTable(): UpgradesListTable
+    {
+        return $this->list_table;
+    }
+
+    /**
      * Register our dashboard page.
      * `add_dashboard_page()` returns false if the current user doesn't have the capability.
      */
@@ -126,7 +135,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
                 'jquery-ui-core',
                 'jquery-ui-dialog',
             ],
-            VERSION,
+            VERSION, // phpcs:ignore
             true
         );
         \wp_register_script(
@@ -135,13 +144,13 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             [
                 'jquery',
             ],
-            VERSION,
+            VERSION, // phpcs:ignore
             true
         );
         \wp_register_style(
             'upgrade-task-runner',
             $this->getPlugin()->getUrl('/assets/upgrades.css'),
-            VERSION,
+            VERSION, // phpcs:ignore
             null
         );
         \wp_enqueue_style('wp-jquery-ui-dialog');
@@ -161,6 +170,7 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             'upgrade-task-runner',
             'wpUpgradeTaskRunner',
             [
+                'currentUserId' => \get_current_user_id(),
                 'nonceKeyName' => self::NONCE_NAME,
             ]
         );
@@ -225,8 +235,10 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
             \wp_send_json_error(['error' => 'incorrect capabilities']);
         }
 
-        if ($this->triggerTaskRunnerScheduleEvent($request)) {
-            \wp_send_json_success();
+        $model = $this->triggerTaskRunnerScheduleEvent($request);
+        if ($model instanceof UpgradeModel) {
+            $event = \wp_get_scheduled_event(\get_class($model->getTaskRunner()), [$model]);
+            \wp_send_json_success(['event' => $event]);
         }
 
         \wp_send_json_error(['error' => 'cron schedule not set']);
@@ -236,9 +248,9 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
      * Trigger the Task Runner and Schedule a one off event.
      * Be sure to check for `$bag->has('item')` before calling this method.
      * @param ParameterBag $bag
-     * @return bool
+     * @return UpgradeModel|null
      */
-    private function triggerTaskRunnerScheduleEvent(ParameterBag $bag): bool
+    private function triggerTaskRunnerScheduleEvent(ParameterBag $bag): ?UpgradeModel
     {
         $key = \array_search(
             \rawurldecode($bag->get('item')),
@@ -254,29 +266,35 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
              * @var UpgradeModel $model
              */
             $model = $this->task_loader->getFields()[$key];
+            $model->setUserId(\absint($bag->get('userId', 0)));
             $options = Option::getOptions();
             $option_key = Option::getOptionKey($model);
             if (empty($options[$option_key])) {
                 $model->getTaskRunner()->scheduleEvent(\get_class($model->getTaskRunner()), $model);
-                return true;
+                return $model;
             }
         }
 
-        return false;
+        return null;
     }
 
     /**
      * Return the HTML to output the current count of migrations that are pending.
+     * @since 2.2.0 Add dashicon warning icon to flag negative counts
      * @return string
      */
     private function getUpgradeCountHtml(): string
     {
         $count = $this->getUpgradeCount();
+        if (\substr(\strval($count), 0, 1) === '-') {
+            $error = true;
+        }
 
         return \sprintf(
-            '&nbsp;<span class="update-plugins count-%s"><span class="plugin-count">%s</span></span>',
-            \strval($count),
-            \number_format_i18n($count)
+            '&nbsp;<span class="update-plugins count-%1$s"><span class="plugin-count">%2$s</span></span>%3$s',
+            \absint($count),
+            \number_format_i18n($count),
+            !isset($error) ? '' : '<span class="dashicons dashicons-warning"></span>'
         );
     }
 
@@ -288,6 +306,6 @@ class Upgrade extends AbstractHookProvider implements HttpFoundationRequestInter
      */
     private function getUpgradeCount(): int
     {
-        return \absint(\count($this->task_loader->getFields()) - \count(Option::getOptions()));
+        return \intval(\count($this->task_loader->getFields()) - \count(Option::getOptions()));
     }
 }
