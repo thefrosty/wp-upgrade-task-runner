@@ -7,63 +7,43 @@ use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
 use TheFrosty\WpUpgradeTaskRunner\Option;
 use TheFrosty\WpUpgradeTaskRunner\Upgrade;
 use TheFrosty\WpUtilities\Plugin\HooksTrait;
-use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
 
 /**
  * Class DbUpgrade
  */
-class DbUpgrade implements WpHooksInterface
+class DbUpgrade extends AbstractUpgrade
 {
 
     use HooksTrait;
 
-    private const NONCE_ACTION = self::class;
-    private const NONCE_NAME = '_wputr_nonce';
+    public const NONCE_ACTION = self::class;
+    public const NONCE_NAME = '_wputr_nonce';
 
     /**
-     * Array of UpgradeModel objects.
-     * @var UpgradeModel[] $models
+     * DB Version
+     * @var string $db_version
      */
-    private $models;
-
-    /**
-     * Request object.
-     * @var Request $request
-     */
-    private $request;
-
-    /** @var string $db_version */
     private $db_version;
-
-    /**
-     * Add class hooks.
-     */
-    public function addHooks(): void
-    {
-        $this->addAction(Upgrade::TAG_SETTINGS_PAGE_LOADED, [$this, 'updateSettings'], 10, 2);
-        $this->addAction(Upgrade::UPGRADES_LIST_TABLE_ACTION, [$this, 'renderUpdateNag']);
-    }
 
     /**
      * Update the DB.
      * @param UpgradeModel[]|UpgradeModel $models
      * @param Request $request
      */
-    protected function updateSettings($models, Request $request): void
+    protected function maybeRunUpgrade($models, Request $request): void
     {
         $this->models = $models;
         $this->request = $request;
         $this->db_version = Option::getVersion();
-        if (\defined('DOING_AJAX') && \DOING_AJAX ||
+        if (\wp_doing_ajax() ||
             !$request->query->has(self::NONCE_NAME) ||
-            !\wp_verify_nonce($request->query->get(self::NONCE_NAME), self::NONCE_ACTION)
+            !\wp_verify_nonce($request->query->get(self::NONCE_NAME), self::NONCE_ACTION) ||
+            empty($this->db_version)
         ) {
             return;
         }
 
-        if (empty($this->db_version)) {
-            $this->upgradeVOneToVTwo();
-        }
+        $this->upgradeVOneToVTwo();
     }
 
     /**
