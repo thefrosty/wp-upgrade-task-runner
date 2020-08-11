@@ -7,10 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 
 ## [2.2.0] - 2020-08-10
-- Bumped "Requires at least" to WordPress 5.4.
-- Bumped "tested up to" to WordPress 5.5.
+- [NEW] Bumped "Requires at least" to WordPress 5.4.
+- [NEW] Bumped "tested up to" to WordPress 5.5.
 - JS should now show event scheduled after clicking "run".
 - If deprecated or old tasks are removed from registration but exist in the DB, a new cleanup task can be run.
+- Add role cap checks (filterable) to view the settings page (tasks) and run tasks.
+   * `Upgrade::TAG_VIEW_SETTINGS_PAGE_CAP` defaults to `list_users` 
+   * `Upgrade::TAG_UPGRADE_TASKS_CAP` defaults to `promote_users` 
 - Add public method for `UpgradesListTable` in `TaskRunner\Upgrade`.
    * Change response on AJAX action to include scheduled cron event object data (passed to JS). 
    * Allow negative task count to show warning and allow internal re-count task (notice count).

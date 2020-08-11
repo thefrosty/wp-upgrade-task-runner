@@ -201,6 +201,7 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
         } elseif ($request->query->has('item') && $request->query->get('item') === $item->getTitle()) {
             $actions = ['run' => '<a href="javascript:void(0)">Running...</a>'];
         } elseif (!empty($options[$key])) {
+            $show = true;
             $date = !empty($options[$key][Option::SETTING_DATE]) ? $options[$key][Option::SETTING_DATE] : $options[$key];
             $datetime = (new \DateTime($date, new \DateTimeZone('UTC')));
             $user = !empty($options[$key][Option::SETTING_USER]) ?
@@ -218,6 +219,11 @@ data-action="%2$s" data-item="%3$s" data-nonce="%4$s">%5$s</a>',
                     $user instanceof \WP_User ? $user->user_login : \esc_html__('N/A', 'wp-upgrade-task-runner')
                 ),
             ];
+        }
+
+        // Lower level user check to view tasks.
+        if (!\current_user_can(\apply_filters(Upgrade::TAG_UPGRADE_TASKS_CAP, 'promote_users')) && !isset($show)) {
+            $actions = ['run' => '<a href="javascript:void(0)">You don\'t have permissions to run this task</a>'];
         }
 
         // Return the title contents

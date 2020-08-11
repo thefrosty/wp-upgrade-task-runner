@@ -50,7 +50,8 @@ class TaskCountCheck extends AbstractUpgrade
      */
     protected function renderUpdateNag(): void
     {
-        if (!$this->request->query->has('page') ||
+        if (!\current_user_can(\apply_filters(Upgrade::TAG_UPGRADE_TASKS_CAP, 'promote_users')) ||
+            !$this->request->query->has('page') ||
             $this->request->query->get('page') !== Upgrade::MENU_SLUG ||
             !$this->isCompletedTaskCountNegative()
         ) {
