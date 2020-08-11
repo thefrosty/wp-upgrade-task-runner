@@ -15,6 +15,7 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
 
     public const FIELD_DATE = 'date';
     public const FIELD_TITLE = 'title';
+    public const FIELD_USER_ID = 'user_id';
     public const FIELD_DESCRIPTION = 'description';
     public const FIELD_TASK_RUNNER = 'task_runner';
     private const REQUIRED_FIELDS = [
@@ -37,6 +38,13 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
      * @var string $title
      */
     private $title;
+
+    /**
+     * The user ID who initiated the task.
+     *
+     * @var int $user_id
+     */
+    private $user_id;
 
     /**
      * The description of the migration/upgrade.
@@ -102,6 +110,16 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
     public function setTitle(string $title): void
     {
         $this->title = $title;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->user_id;
+    }
+
+    public function setUserId(int $user_id): void
+    {
+        $this->user_id = $user_id;
     }
 
     public function getDescription(): string

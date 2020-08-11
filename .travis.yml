@@ -9,6 +9,11 @@ cache:
 language: php
 php:
   - '7.3'
+  - '7.4'
+
+jobs:
+  allow_failures:
+    - php: 7.4
 
 branches:
   only:
@@ -20,7 +25,7 @@ env:
     - WORDPRESS_DB_USER=wp
     - WORDPRESS_DB_PASS=password
     - WORDPRESS_DB_NAME=wp_tests
-    - WP_VERSION=5.1
+    - WP_VERSION=5.4.2
     - WP_MULTISITE=0
 
 matrix:
