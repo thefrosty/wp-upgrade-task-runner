@@ -20,7 +20,9 @@
   component.init = function () {
     $(function () {
       $(document).on('click', 'a[class="wp-upgrade-task-runner-item"]', function (e) {
-        component.submitTaskRunner($(this))
+        if (!e.isDefaultPrevented()) {
+          component.submitTaskRunner($(this))
+        }
         e.preventDefault()
         return false
       })
