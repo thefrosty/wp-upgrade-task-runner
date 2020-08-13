@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.2.1] - 2020-08-13
+- Add check in JS for run link confirmation callback. 
+
 ## [2.2.0] - 2020-08-10
 - [NEW] Bumped "Requires at least" to WordPress 5.4.
 - [NEW] Bumped "tested up to" to WordPress 5.5.
