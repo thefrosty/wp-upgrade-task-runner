@@ -24,10 +24,10 @@
     "php": ">=7.3",
     "pimple/pimple": "^3.2",
     "symfony/http-foundation": "^4.4.7|^5.0.7",
-    "thefrosty/wp-utilities": "^1.7"
+    "thefrosty/wp-utilities": "^2.0"
   },
   "require-dev": {
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
     "phpcompatibility/php-compatibility": "^9.3",
     "phpunit/phpunit": "^6|^7",
     "slevomat/coding-standard": "^4",
