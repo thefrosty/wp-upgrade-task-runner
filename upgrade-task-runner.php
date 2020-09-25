@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 /**
  * A WordPress plugin for developers to write custom migration tasks.
  *
@@ -12,7 +13,7 @@
  * Requires at least: 5.4
  * Tested up to: 5.5.1
  * Requires PHP: 7.3
- *
+ * phpcs:disable SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified
  * @package TheFrosty\WpUpgradeTaskRunner
  */
 
@@ -24,12 +25,11 @@ const VERSION = '2.3.0';
 use TheFrosty\WpUpgradeTaskRunner\Cli\DispatchTasks;
 use TheFrosty\WpUpgradeTaskRunner\Upgrade\DbUpgrade;
 use TheFrosty\WpUpgradeTaskRunner\Upgrade\TaskCountCheck;
-use TheFrosty\WpUtilities\Plugin\Container;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
 
 $plugin = PluginFactory::create(SLUG);
-/** Container object. @var Container $container */
+/** Container object. @var \TheFrosty\WpUtilities\Plugin\Container $container */
 $container = $plugin->getContainer();
 $container->register(new ServiceProvider());
 $plugin
