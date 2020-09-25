@@ -27,7 +27,7 @@
     "thefrosty/wp-utilities": "^1.7"
   },
   "require-dev": {
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
     "phpcompatibility/php-compatibility": "^9.3",
     "phpunit/phpunit": "^6|^7",
     "slevomat/coding-standard": "^4",
