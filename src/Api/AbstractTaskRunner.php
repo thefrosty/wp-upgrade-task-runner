@@ -14,6 +14,10 @@ use TheFrosty\WpUpgradeTaskRunner\Option;
 abstract class AbstractTaskRunner implements TaskRunnerInterface
 {
 
+    public const DATE = null;
+    public const DESCRIPTION = null;
+    public const TITLE = null;
+
     /**
      * Dispatch the migration task.
      *
