@@ -13,10 +13,6 @@ use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
 interface TaskRunnerInterface
 {
 
-    public const DATE = null;
-    public const DESCRIPTION = null;
-    public const TITLE = null;
-
     /**
      * Dispatch the migration task.
      *
