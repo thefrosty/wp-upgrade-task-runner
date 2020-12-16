@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.4.0] - 2020-12-16
+- Fix: Cannot inherit previously-inherited or override constant DATE from interface
+
 ## [2.3.0] - 2020-09-25
 - Update thefrosty/wp-utilities requirement from ^1.7 to ^2.0 [#32](https://github.com/thefrosty/wp-upgrade-task-runner/pull/32)
 - Update dealerdirect/phpcodesniffer-composer-installer requirement from ^0.4.3 to ^0.7.0 [#21](https://github.com/thefrosty/wp-upgrade-task-runner/pull/21)
