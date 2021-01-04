@@ -81,16 +81,13 @@ class TaskCountCheck extends AbstractUpgrade
         $old_options = Option::getOptions();
         $legacy_tasks = $this->getLegacyOptions();
         foreach ($old_options as $option_key => $task) {
-            $key = \array_search(
-                $option_key,
-                \array_map(
-                    static function (UpgradeModel $model): string {
-                        return Option::getOptionKey($model);
-                    },
-                    $this->models
-                ),
-                true
-            );
+            $models = \array_map(static function (UpgradeModel $model): string {
+                return Option::getOptionKey($model);
+            }, $this->models);
+            if (!$models) {
+                continue;
+            }
+            $key = \array_search($option_key, $models, true);
             if ($key === false) {
                 $legacy_tasks[$option_key] = $task;
                 unset($old_options[$option_key]);
