@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.4.1] - 2021-01-04
+- Fix: Make sure `UpdateModel` implements `Countable`.
+
 ## [2.4.0] - 2020-12-16
 - Fix: Cannot inherit previously-inherited or override constant DATE from interface
 

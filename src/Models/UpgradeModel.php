@@ -2,6 +2,7 @@
 
 namespace TheFrosty\WpUpgradeTaskRunner\Models;
 
+use Countable;
 use TheFrosty\WpUpgradeTaskRunner\Api\TaskRunnerInterface;
 use TheFrosty\WpUtilities\Models\BaseModel;
 
@@ -10,7 +11,7 @@ use TheFrosty\WpUtilities\Models\BaseModel;
  *
  * @package TheFrosty\WpUpgradeTaskRunner
  */
-class UpgradeModel extends BaseModel implements UpgradeModelInterface
+class UpgradeModel extends BaseModel implements Countable, UpgradeModelInterface
 {
 
     public const FIELD_DATE = 'date';
@@ -24,6 +25,12 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
         self::FIELD_DESCRIPTION,
         self::FIELD_TASK_RUNNER,
     ];
+
+    /**
+     * Model count.
+     * @var array $model
+     */
+    private $model;
 
     /**
      * DateTime object of the creation date.
@@ -74,7 +81,17 @@ class UpgradeModel extends BaseModel implements UpgradeModelInterface
             );
         }
 
+        $this->model[] = $fields;
         parent::__construct($fields);
+    }
+
+    /**
+     * Return the count.
+     * @return int
+     */
+    public function count(): int
+    {
+        return \count($this->model);
     }
 
     /**
