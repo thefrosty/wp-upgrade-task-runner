@@ -8,12 +8,12 @@ cache:
 
 language: php
 php:
-  - '7.3'
   - '7.4'
+  - '8.0'
 
 jobs:
   allow_failures:
-    - php: 7.4
+    - php: 8.0
 
 branches:
   only:
@@ -25,8 +25,9 @@ env:
     - WORDPRESS_DB_USER=wp
     - WORDPRESS_DB_PASS=password
     - WORDPRESS_DB_NAME=wp_tests
-    - WP_VERSION=5.5.3
+    - WP_VERSION=5.8.1
     - WP_MULTISITE=0
+    - XDEBUG_MODE=coverage
 
 matrix:
   fast_finish: true
