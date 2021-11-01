@@ -36,7 +36,6 @@ class DispatchTasks implements WpHooksInterface
 
     /**
      * Add class hooks.
-     * @throws \Exception
      */
     public function addHooks(): void
     {
@@ -53,6 +52,9 @@ class DispatchTasks implements WpHooksInterface
      *
      * [--task=<class>]
      * : The fully qualified registered task to run.
+     * @param mixed $args
+     * @param mixed $assoc_args
+     * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     private function dispatchTaskRunner($args, $assoc_args): void
     {

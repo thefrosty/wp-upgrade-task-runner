@@ -21,7 +21,7 @@ final class UpgradeModelFactory
     {
         try {
             return new UpgradeModel($fields);
-        } catch (Exception $exception) {
+        } catch (Exception $exception) { // phpcs:ignore
             return null;
         }
     }
