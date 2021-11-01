@@ -2,6 +2,8 @@
 
 namespace TheFrosty\WpUpgradeTaskRunner\Models;
 
+use TheFrosty\WpUpgradeTaskRunner\Exceptions\Exception;
+
 /**
  * Class UpgradeModelFactory
  * @package TheFrosty\WpUpgradeTaskRunner\Models
@@ -19,7 +21,7 @@ final class UpgradeModelFactory
     {
         try {
             return new UpgradeModel($fields);
-        } catch (\TheFrosty\WpUpgradeTaskRunner\Exceptions\Exception $exception) {
+        } catch (Exception $exception) {
             return null;
         }
     }
