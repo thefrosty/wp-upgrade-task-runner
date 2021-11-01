@@ -132,7 +132,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      */
     protected function currentScreenCheck(\WP_Screen $screen): void
     {
-        if ($screen === $this->screen_id) {
+        if ($screen->id === $this->screen_id) {
             return;
         }
 
