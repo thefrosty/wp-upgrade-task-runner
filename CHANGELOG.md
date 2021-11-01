@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.5.0] - 2021-11-01
+- Update: PHP minimum version is now `7.4`.
+- Change: The CLI command to run all tasks is now: `$ wp upgrade-task-runner`.
+  - Add new flag to run specific task: $ wp upgrade-task-runner --task=Fully\\Qualified\\Name`
+- Fix: Conditional loading of the CLI Dispatcher class is now differed until `init`, which avoids some
+  PHP errors. 
+
 ## [2.4.3] - 2021-01-04
 - Fix: Make sure `UpdateModel` implements `Countable`.
 - Fix: Make sure `TaskCountCheck` checks for existing model arrays in array search.

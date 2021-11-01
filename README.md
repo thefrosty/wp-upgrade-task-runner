@@ -7,14 +7,13 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/thefrosty/wp-upgrade-task-runner.svg)](https://packagist.org/packages/thefrosty/wp-upgrade-task-runner)
 [![License](https://img.shields.io/packagist/l/thefrosty/wp-upgrade-task-runner.svg)](https://packagist.org/packages/thefrosty/wp-upgrade-task-runner)
 [![Build Status](https://travis-ci.org/thefrosty/wp-upgrade-task-runner.svg?branch=master)](https://travis-ci.org/thefrosty/wp-upgrade-task-runner)
-[![Beerpay](https://beerpay.io/thefrosty/wp-upgrade-task-runner/badge.svg?style=flat)](https://beerpay.io/thefrosty/wp-upgrade-task-runner)
 
 Register custom migration tasks that can be triggered from a dashboard in the admin and run via AJAX.
 
 ### Requirements
 
 ```
-PHP >= 7.3
+PHP >= 7.4
 WordPress >= 5.4
 ```
 
@@ -61,4 +60,4 @@ the `ExampleMigrationTask`).
 
 ### CLI
 
-Run all registered tasks (not already run) via wp-cli: `$ wp wp-upgrade-task-runner`.
+Run all registered tasks (not already run) via wp-cli: `$ wp upgrade-task-runner`.

@@ -132,7 +132,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      */
     protected function currentScreenCheck(\WP_Screen $screen): void
     {
-        if ($screen === $this->screen_id) {
+        if ($screen->id === $this->screen_id) {
             return;
         }
 
@@ -169,6 +169,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
             return [];
         }
 
+        $tasks = [];
         foreach ($this as $task) {
             if (!($task instanceof TaskRunnerInterface)) {
                 continue;
@@ -177,7 +178,7 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
             $tasks[] = $task;
         }
 
-        return $tasks ?? [];
+        return $tasks;
     }
 
     /**

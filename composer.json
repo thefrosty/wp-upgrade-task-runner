@@ -21,7 +21,7 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=7.3",
+    "php": "^7.4|^8.0",
     "pimple/pimple": "^3.2",
     "symfony/http-foundation": "^4.4.7|^5.0.7",
     "thefrosty/wp-utilities": "^2.0"
@@ -57,7 +57,7 @@
       "bash ./bin/phpcs.sh"
     ],
     "phpunit": [
-      "phpunit --colors"
+      "./vendor/bin/phpunit --colors"
     ],
     "tests": [
       "@phpcs",
