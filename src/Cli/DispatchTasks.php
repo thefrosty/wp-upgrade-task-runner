@@ -7,6 +7,7 @@ use TheFrosty\WpUpgradeTaskRunner\Option;
 use TheFrosty\WpUpgradeTaskRunner\ServiceProvider;
 use TheFrosty\WpUpgradeTaskRunner\Tasks\TaskLoader;
 use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
+use function WP_CLI\Utils\get_flag_value;
 use function WP_CLI\Utils\make_progress_bar;
 
 /**
@@ -14,7 +15,7 @@ use function WP_CLI\Utils\make_progress_bar;
  *
  * @package TheFrosty\WpUpgradeTaskRunner\Cli
  */
-class DispatchTasks extends \WP_CLI_Command implements WpHooksInterface
+class DispatchTasks implements WpHooksInterface
 {
 
     /**
@@ -31,7 +32,6 @@ class DispatchTasks extends \WP_CLI_Command implements WpHooksInterface
     public function __construct(Container $container)
     {
         $this->container = $container;
-        parent::__construct();
     }
 
     /**
@@ -40,17 +40,23 @@ class DispatchTasks extends \WP_CLI_Command implements WpHooksInterface
      */
     public function addHooks(): void
     {
-        $callback = function (): void {
-            $this->dispatchTaskRunner();
+        $callback = function ($args, $assoc_args): void {
+            $this->dispatchTaskRunner($args, $assoc_args);
         };
         \WP_CLI::add_command('upgrade-task-runner', $callback);
     }
 
     /**
      * Dispatch all registered tasks (not already run).
+     *
+     * ## OPTIONS
+     *
+     * [--task=<class>]
+     * : The fully qualified registered task to run.
      */
-    private function dispatchTaskRunner(): void
+    private function dispatchTaskRunner($args, $assoc_args): void
     {
+        $task = get_flag_value($assoc_args, 'task');
         $options = Option::getOptions();
         $run = [];
         $task_loader = $this->invokeRegisterFields();
@@ -65,9 +71,16 @@ class DispatchTasks extends \WP_CLI_Command implements WpHooksInterface
 
         $count = \count($fields);
         $progress = make_progress_bar(\esc_html__('Running Tasks', 'wp-upgrade-task-runner'), $count);
+        $sanitize = static function (?string $task): string {
+            return \sprintf('%s', \sanitize_title_with_dashes(\str_replace('\\', '-', (string)$task)));
+        };
 
         foreach ($task_loader->getFields() as $field) {
-            if (empty($options[Option::getOptionKey($field)])) {
+            $option_key = Option::getOptionKey($field);
+            if (empty($options[$option_key])) {
+                if (\is_string($task) && !empty($task) && $option_key !== $sanitize($task)) {
+                    continue;
+                }
                 $field->getTaskRunner()->dispatch($field);
                 $run[] = \get_class($field);
             }
@@ -85,6 +98,11 @@ class DispatchTasks extends \WP_CLI_Command implements WpHooksInterface
             return;
         }
 
+        if (\is_string($task) && !empty($task)) {
+            \WP_CLI::line(\sprintf('No task found for "%s".', \esc_html($task)));
+
+            return;
+        }
         \WP_CLI::line('No tasks run.');
     }
 
