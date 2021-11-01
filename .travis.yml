@@ -29,6 +29,9 @@ env:
     - WP_MULTISITE=0
     - XDEBUG_MODE=coverage
 
+services:
+  - mysql
+
 matrix:
   fast_finish: true
 
