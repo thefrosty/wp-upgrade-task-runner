@@ -7,7 +7,7 @@ use TheFrosty\WpUpgradeTaskRunner\Option;
 use TheFrosty\WpUpgradeTaskRunner\ServiceProvider;
 use TheFrosty\WpUpgradeTaskRunner\Tasks\TaskLoader;
 use TheFrosty\WpUtilities\Plugin\WpHooksInterface;
-use const TheFrosty\WpUpgradeTaskRunner\SLUG;
+use function WP_CLI\Utils\make_progress_bar;
 
 /**
  * Class DispatchTasks
@@ -18,9 +18,10 @@ class DispatchTasks extends \WP_CLI_Command implements WpHooksInterface
 {
 
     /**
+     * Container object.
      * @var Container $container
      */
-    private $container;
+    private Container $container;
 
     /**
      * TaskCommand constructor.
@@ -35,17 +36,14 @@ class DispatchTasks extends \WP_CLI_Command implements WpHooksInterface
 
     /**
      * Add class hooks.
+     * @throws \Exception
      */
     public function addHooks(): void
     {
-        if (!\class_exists('WP_CLI') || (!\defined('WP_CLI') || !\WP_CLI)) {
-            return;
-        }
-
         $callback = function (): void {
             $this->dispatchTaskRunner();
         };
-        \WP_CLI::add_command(SLUG, $callback);
+        \WP_CLI::add_command('upgrade-task-runner', $callback);
     }
 
     /**
@@ -66,7 +64,7 @@ class DispatchTasks extends \WP_CLI_Command implements WpHooksInterface
         }
 
         $count = \count($fields);
-        $progress = \WP_CLI\Utils\make_progress_bar(\esc_html__('Running Tasks', 'wp-upgrade-task-runner'), $count);
+        $progress = make_progress_bar(\esc_html__('Running Tasks', 'wp-upgrade-task-runner'), $count);
 
         foreach ($task_loader->getFields() as $field) {
             if (empty($options[Option::getOptionKey($field)])) {
