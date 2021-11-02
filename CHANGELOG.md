@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.5.1] - 2021-11-02
+- Fix: Add `--user` flag as option for CLI request, defaulting to `0` to avoid error on completed model. 
+
 ## [2.5.0] - 2021-11-01
 - Update: PHP minimum version is now `7.4`.
 - Change: The CLI command to run all tasks is now: `$ wp upgrade-task-runner`.
