@@ -9,16 +9,14 @@ cache:
 language: php
 php:
   - '7.4'
-  - '8.0'
-
-jobs:
-  allow_failures:
-    - php: 8.0
 
 branches:
   only:
-    - master
     - develop
+    - "/^.*[Ff]eature\\/.*$/"
+    - "/^.*[rR]elease\\/.*$/"
+    - "/^.*[bB]ug\\/.*$/"
+    - "/^.*[Hh]otfix\\/.*$/"
 
 env:
   global:
@@ -39,13 +37,6 @@ install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - export DEV_BIN_PATH=bin
   - source $DEV_BIN_PATH/create-all-branches.sh
-  - |
-    # Remove Xdebug for a huge performance increase:
-    if [ -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini ]; then
-      phpenv config-rm xdebug.ini
-    else
-      echo "xdebug.ini does not exist"
-    fi
   - composer require --dev --no-update roots/wordpress:${WP_VERSION} wp-phpunit/wp-phpunit:${WP_VERSION}
   - composer update --prefer-dist --no-interaction --prefer-stable --no-suggest
 
