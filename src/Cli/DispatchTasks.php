@@ -52,6 +52,12 @@ class DispatchTasks implements WpHooksInterface
      *
      * [--task=<class>]
      * : The fully qualified registered task to run.
+     * ---
+     *
+     * [--user=<id>]
+     * : The user ID to associate with running said task(s).
+     * ---
+     *
      * @param mixed $args
      * @param mixed $assoc_args
      * @phpcs:disable SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
@@ -83,6 +89,7 @@ class DispatchTasks implements WpHooksInterface
                 if (\is_string($task) && !empty($task) && $option_key !== $sanitize($task)) {
                     continue;
                 }
+                $field->setUserId(\absint(get_flag_value($assoc_args, 'user', 0)));
                 $field->getTaskRunner()->dispatch($field);
                 $run[] = \get_class($field);
             }
