@@ -20,14 +20,14 @@ class WpUnitTestCase extends WP_UnitTestCase
     const SLUG = 'wp-upgrade-task-runner-test';
 
     /** @var Plugin $plugin */
-    protected $plugin;
+    protected Plugin $plugin;
     /** @var Container $container */
     protected $container;
 
     /**
      * Set up.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->plugin = PluginFactory::create(self::SLUG);
@@ -39,7 +39,7 @@ class WpUnitTestCase extends WP_UnitTestCase
     /**
      * Tear down.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         unset($this->plugin, $this->container);
@@ -47,14 +47,11 @@ class WpUnitTestCase extends WP_UnitTestCase
 
     /**
      * Gets an instance of the \ReflectionObject.
-     *
      * @param object $argument
-     *
      * @return \ReflectionObject
      */
-    protected function getReflection($argument): \ReflectionObject
+    protected function getReflection(object $argument): \ReflectionObject
     {
-        // phpcs:enable
         static $reflector;
 
         if (!($reflector instanceof \ReflectionObject)) {
