@@ -13,18 +13,18 @@ class UpgradeTest extends WpUnitTestCase
 {
 
     /** @var Upgrade $upgrade */
-    private $upgrade;
+    private Upgrade $upgrade;
 
     /** @var int $admin_user_id */
-    private $admin_user_id;
+    private int $admin_user_id;
 
     /** @var int $admin_user_id */
-    private $author_user_id;
+    private int $author_user_id;
 
     /**
      * Set up.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class UpgradeTest extends WpUnitTestCase
     /**
      * Tear down.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         unset($this->upgrade, $GLOBALS['hook_suffix']);
@@ -64,7 +64,7 @@ class UpgradeTest extends WpUnitTestCase
     /**
      * Test Construct
      */
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf('TheFrosty\WpUpgradeTaskRunner\Upgrade', $this->upgrade);
     }
@@ -72,7 +72,7 @@ class UpgradeTest extends WpUnitTestCase
     /**
      * Test class constants.
      */
-    public function testConstants()
+    public function testConstants(): void
     {
         $constants = $this->getReflection($this->upgrade)->getConstants();
 
@@ -97,7 +97,7 @@ class UpgradeTest extends WpUnitTestCase
     /**
      * Test addDashboardPage() is available.
      */
-    public function testAddDashboardPage()
+    public function testAddDashboardPage(): void
     {
         \wp_set_current_user($this->admin_user_id);
         $this->upgrade->addHooks();
@@ -115,7 +115,7 @@ class UpgradeTest extends WpUnitTestCase
     /**
      * Test addDashboardPage() when the current user is an admin.
      */
-    public function testAddDashboardPageWithAdmin()
+    public function testAddDashboardPageWithAdmin(): void
     {
         \wp_set_current_user($this->admin_user_id);
         $this->upgrade->addHooks();
@@ -136,7 +136,7 @@ class UpgradeTest extends WpUnitTestCase
     /**
      * Test addDashboardPage() when the current user is a non-admin.
      */
-    public function testAddDashboardPageWithNonAdmin()
+    public function testAddDashboardPageWithNonAdmin(): void
     {
         \wp_set_current_user($this->author_user_id);
         $this->upgrade->addHooks();
@@ -158,7 +158,7 @@ class UpgradeTest extends WpUnitTestCase
     /**
      * Test enqueueScripts()
      */
-    public function testEnqueueScripts()
+    public function testEnqueueScripts(): void
     {
         \wp_set_current_user($this->admin_user_id);
         $this->upgrade->addHooks();

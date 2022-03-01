@@ -61,3 +61,7 @@ the `ExampleMigrationTask`).
 ### CLI
 
 Run all registered tasks (not already run) via wp-cli: `$ wp upgrade-task-runner`.
+
+#### CLI OPTIONS
+     [--task=<class>] : The fully qualified registered task to run.
+     [--user=<id>] : The user ID to associate with running said task(s).
