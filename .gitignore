@@ -2,4 +2,6 @@
 .idea/
 coverage/
 vendor/
+wordpress/
 composer.lock
+phpunit.xml.bak
