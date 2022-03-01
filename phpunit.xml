@@ -1,23 +1,31 @@
+<?xml version="1.0"?>
 <phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         backupGlobals="false"
         bootstrap="tests/bootstrap.php"
         colors="true"
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
-        convertWarningsToExceptions="true">
-    <php>
-        <ini name="error_reporting" value="24575" />
-        <env name="WP_PHPUNIT__TESTS_CONFIG" value="./tests/wp-tests-config.php" />
-    </php>
-    <testsuites>
-        <testsuite name="unit">
-            <directory phpVersion="7.3" phpVersionOperator=">=">./tests/unit/</directory>
-        </testsuite>
-    </testsuites>
-
+        convertWarningsToExceptions="true"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+>
+    <coverage processUncoveredFiles="false">
+        <include>
+            <directory suffix=".php">./tests/unit/</directory>
+        </include>
+    </coverage>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">./tests/unit/</directory>
         </whitelist>
     </filter>
+    <php>
+        <ini name="error_reporting" value="24575"/>
+        <env name="WP_PHPUNIT__TESTS_CONFIG" value="./tests/wp-tests-config.php"/>
+    </php>
+    <testsuites>
+        <testsuite name="unit">
+            <directory phpVersion="7.4" phpVersionOperator=">=">./tests/unit/</directory>
+        </testsuite>
+    </testsuites>
 </phpunit>
