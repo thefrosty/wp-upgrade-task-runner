@@ -69,7 +69,7 @@
       "bash ./vendor/thefrosty/wp-utilities/bin/phpcs.sh"
     ],
     "phpunit": [
-      "./vendor/bin/phpunit --colors --verbose --coverage-html ./tests/results && php ./tests/clover-results.php ./tests/clover.xml 10"
+      "./vendor/bin/phpunit --colors --verbose --coverage-html ./tests/results && php ./tests/clover-results.php ./tests/clover.xml 0"
     ],
     "tests": [
       "@phpcs",
