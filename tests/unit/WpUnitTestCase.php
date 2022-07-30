@@ -70,14 +70,27 @@ class WpUnitTestCase extends WP_UnitTestCase
     }
 
     /**
-     * Get a Mock Provider.
+     * Mock `$className`.
      * @param string $className
+     * @param array|null $constructorArgs
+     * @param array|null $setMethods
      * @return MockObject
      */
-    protected function getMockProvider(string $className): MockObject
-    {
-        return $this->getMockBuilder($className)
-                    ->onlyMethods([self::METHOD_ADD_FILTER])
-                    ->getMock();
+    protected function getMockProvider(
+        string $className,
+        ?array $constructorArgs = null,
+        ?array $setMethods = null
+    ): MockObject {
+
+        $mockBuilder = $this->getMockBuilder($className);
+        if ($constructorArgs) {
+            $mockBuilder->setConstructorArgs($constructorArgs);
+        }
+        $methods = [self::METHOD_ADD_FILTER];
+        if ($setMethods) {
+            $methods = \array_merge($methods, $setMethods);
+        }
+
+        return $mockBuilder->onlyMethods($methods)->getMock();
     }
 }
