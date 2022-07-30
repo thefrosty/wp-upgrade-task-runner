@@ -1,0 +1,33 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:5.6
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: wordpress_test
+      MYSQL_ROOT_PASSWORD: mysql_root_password
+      MYSQL_USER: wordpress_user
+      MYSQL_PASSWORD: mysql_password
+    restart: always
+
+  phpfpm:
+    image: php:8.0-fpm-alpine
+    depends_on:
+      - db
+    deploy:
+      replicas: 4
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress_test
+      WORDPRESS_DB_PASSWORD: mysql_password
+      WORDPRESS_DB_PREFIX: wp_
+      WORDPRESS_DB_USER: wordpress_user
+    restart: always
+
+volumes:
+  db_data:
