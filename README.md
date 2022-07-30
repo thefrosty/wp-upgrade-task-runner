@@ -6,7 +6,8 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/thefrosty/wp-upgrade-task-runner.svg)](https://packagist.org/packages/thefrosty/wp-upgrade-task-runner)
 [![Total Downloads](https://img.shields.io/packagist/dt/thefrosty/wp-upgrade-task-runner.svg)](https://packagist.org/packages/thefrosty/wp-upgrade-task-runner)
 [![License](https://img.shields.io/packagist/l/thefrosty/wp-upgrade-task-runner.svg)](https://packagist.org/packages/thefrosty/wp-upgrade-task-runner)
-[![Build Status](https://travis-ci.org/thefrosty/wp-upgrade-task-runner.svg?branch=master)](https://travis-ci.org/thefrosty/wp-upgrade-task-runner)
+![Build Status](https://github.com/thefrosty/wp-upgrade-task-runner/actions/workflows/main.yml/badge.svg)
+[![codecov](https://codecov.io/gh/thefrosty/wp-upgrade-task-runner/branch/develop/graph/badge.svg)](https://codecov.io/gh/thefrosty/wp-upgrade-task-runner)
 
 Register custom migration tasks that can be triggered from a dashboard in the admin and run via AJAX.
 
