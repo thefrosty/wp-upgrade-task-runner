@@ -3,6 +3,7 @@
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 /* Path to the WordPress codebase you'd like to test. Add a forward slash in the end. */
 define('ABSPATH', dirname(__DIR__) . '/wordpress/');
+
 /*
  * Path to the theme to test with.
  *
@@ -30,35 +31,35 @@ define('WP_DEBUG', true);
 // WARNING WARNING WARNING!
 // These tests will DROP ALL TABLES in the database with the prefix named below.
 // DO NOT use a production database or one that is shared with something else.
+
 define('DB_NAME', getenv('WORDPRESS_DB_NAME') ?: 'wordpress_test');
-define('DB_USER', getenv('WORDPRESS_DB_USER') ?: 'wordpress_user');
-define('DB_PASSWORD', getenv('WORDPRESS_DB_PASS') ?: 'mysql_password');
-define('DB_HOST', getenv('WORDPRESS_DB_HOST') ?: 'localhost');
+define('DB_USER', getenv('WORDPRESS_DB_USER') ?: 'wp');
+define('DB_PASSWORD', getenv('WORDPRESS_DB_PASS') ?: 'password');
+define('DB_HOST', getenv('WORDPRESS_DB_HOST') ?: '127.0.0.1');
 define('DB_CHARSET', 'utf8mb4');
 define('DB_COLLATE', '');
 
 /**#@+
  * Authentication Unique Keys and Salts.
- *
  * Change these to different unique phrases!
  * You can generate these using the
  * {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
  */
-define('AUTH_KEY', '#,+Zam!9.)h;PpLaSlT++Kd7)+[zp.QKZV*kttjqi8WnNp+@p!&wf0H?tB:&C[UN');
-define('SECURE_AUTH_KEY', '(@UehBTA^-Ncn@Bm`L+|`!;f=P/g;:n*Galw4ml.`fV,0hb~G?[R<vhRn$vqZCo5');
-define('LOGGED_IN_KEY', 'r=yn5qj+=c n,@Q-:sF:T{}]oVckubbLd_5_g..{+|h;nU2_e+nMtMlJ6!|B;nCt');
-define('NONCE_KEY', 'd?9V*>ZVe2N+bO>rF,pMB3AzNr~*)T)%`N.M421.E*x]jehx-gO3Uc#6o/DBUIW&');
-define('AUTH_SALT', '=q 5#w[FLLj)Aa%^}4Gux![V*==@0/L]@L+?YgQpqqj?EBTT,J9 MT|b*Qor*AUq');
-define('SECURE_AUTH_SALT', 'HA6w)E|K|c[bB.H}iLM?OoZ*}Qyq|qh8QzY-,0=k#7D9#;k6,&e;sf;R$^IT^|cM');
-define('LOGGED_IN_SALT', '7qj+-QM|)C}ZFZ$?2eC&xC$`%|6jJb_+wOd`|NalfS^%^D.|D!j+cOVyTW_#62o#');
-define('NONCE_SALT', 'Fm`|BOqG8zAUAN[HEf$:uam=0Q|,Zlx6!qYH,kMX3-X%>t6Y3jrT:`KY>igCEB50');
+define('AUTH_KEY', 'FSr(]lK3ah5UkTx0erXxW~#-[kcXQ-_FfGeGUjf-g$~i1#LsDnO;D^|q~R9!fB-2');
+define('SECURE_AUTH_KEY', '+]MK1=m_7;>{9-V$Bp,q8M>H&un%x~jiJzzDa/xIzc:APzf&P=ML_EWM.[=*D:6`');
+define('LOGGED_IN_KEY', 'eSi6V@Q8eqO.3k&Z<T}e&Ro|+2JS-Tr!-+aAuuKB79TA|SBASE(}V);T>g0=Mm6V');
+define('NONCE_KEY', '~uvZ3MOv{pV;*ac)Sb?^lh|Bq|P1a`-uCuW(;1n5VwW.7nmTFhT%+FS|Rn^nhH3!');
+define('AUTH_SALT', 'hq?z3_jMqOn=t.xcnuG]q>up$[J;W-cXbE=x9IM}20]/CM$73p^NE=g*Y0)?o.He');
+define('SECURE_AUTH_SALT', 'BEQZkO>iH{y*U@aCM=w_kDj|LI8+V+Q:C,9Qvh8e^`(<iia F%GfXFcQ;fklm<##');
+define('LOGGED_IN_SALT', ';5$6](Q;!{wz5(E>8W8BI46+F(nH[D%9LD B|EQE;S>F!Qv*o+Uy:9M<,&f<a([!');
+define('NONCE_SALT', 'AHGu H{Nr:igq)wer$V%hQhTy2)~;7]ZO)=so~n+}AD,fw^l`OD=P,O+t`>PaTIo');
 
 
 $table_prefix = 'wptests_';
 
-define('WP_TESTS_DOMAIN', 'wp-upgrade-task-runner.test');
-define('WP_TESTS_EMAIL', 'admin@wp-upgrade-task-runner.test');
-define('WP_TESTS_TITLE', 'Test CMS');
+define('WP_TESTS_DOMAIN', 'example.org');
+define('WP_TESTS_EMAIL', 'admin@example.org');
+define('WP_TESTS_TITLE', 'Test Blog');
 
 define('WP_PHP_BINARY', 'php');
 
