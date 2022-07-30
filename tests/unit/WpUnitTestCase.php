@@ -3,6 +3,7 @@
 namespace TheFrosty\Tests\WpUpgradeTaskRunner;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use TheFrosty\WpUpgradeTaskRunner\ServiceProvider;
 use TheFrosty\WpUtilities\Plugin\Container;
 use TheFrosty\WpUtilities\Plugin\Plugin;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
@@ -36,6 +37,9 @@ class WpUnitTestCase extends WP_UnitTestCase
         $filename = \dirname(__DIR__, 2) . '/upgrade-task-runner.php';
         $this->plugin = PluginFactory::create('upgrade-task-runner', $filename);
         $this->container = $this->plugin->getContainer();
+        if (empty($this->container->keys())) {
+            $this->container->register(new ServiceProvider());
+        }
     }
 
     /**
