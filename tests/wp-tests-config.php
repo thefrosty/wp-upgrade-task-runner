@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
 
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 /* Path to the WordPress codebase you'd like to test. Add a forward slash in the end. */
-$abspath = defined('TRAVIS') || getenv('TRAVIS') ? '/wordpress/' : '/';
-define('ABSPATH', dirname(__DIR__) . $abspath);
-
+define('ABSPATH', dirname(__DIR__) . '/wordpress/');
 /*
  * Path to the theme to test with.
  *
