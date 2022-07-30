@@ -3,7 +3,6 @@
 namespace TheFrosty\WpUpgradeTaskRunner\PhpUnit;
 
 use TheFrosty\WpUpgradeTaskRunner\Upgrade;
-use TheFrosty\WpUtilities\Plugin\PluginInterface;
 
 /**
  * Class UpgradeTest
@@ -27,11 +26,6 @@ class UpgradeTest extends WpUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->markTestSkipped();
-        $screens = [
-            'index.php?page=upgrade-task-runner' => ['base' => 'dashboard', 'id' => 'dashboard'],
-        ];
         $this->upgrade = new Upgrade($this->container);
         $this->upgrade->setPlugin($this->plugin);
         $GLOBALS['hook_suffix'] = $this->getSettingsPage($this->upgrade);
@@ -43,10 +37,6 @@ class UpgradeTest extends WpUnitTestCase
         $this->author_user_id = $this->factory()->user->create([
             'role' => 'author',
         ]);
-        $this->assertTrue($this->upgrade instanceof Upgrade, 'Upgrade object creation error');
-        $this->assertTrue($this->upgrade->getPlugin() instanceof PluginInterface, 'Upgrade getPlugin object error');
-        $this->assertTrue(is_int($this->admin_user_id), 'Admin user not created');
-        $this->assertTrue(is_int($this->author_user_id), 'Author user not created');
     }
 
     /**
