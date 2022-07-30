@@ -37,6 +37,7 @@
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
+    "ext-simplexml": "*",
     "phpcompatibility/php-compatibility": "^9.3",
     "phpunit/phpunit": "^9",
     "roots/wordpress": "~6.0.0",
@@ -54,7 +55,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "TheFrosty\\WpUpgradeTaskRunner\\PhpUnit\\": "tests/unit"
+      "TheFrosty\\Tests\\WpUpgradeTaskRunner\\": "tests/unit"
     }
   },
   "scripts": {
@@ -65,10 +66,10 @@
       "@install-codestandards"
     ],
     "phpcs": [
-      "bash ./bin/phpcs.sh"
+      "bash ./vendor/thefrosty/wp-utilities/bin/phpcs.sh"
     ],
     "phpunit": [
-      "./vendor/bin/phpunit --colors"
+      "./vendor/bin/phpunit --colors --verbose --coverage-html ./tests/results && php ./tests/clover-results.php ./tests/clover.xml 01"
     ],
     "tests": [
       "@phpcs",
