@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace TheFrosty\WpUpgradeTaskRunner\PhpUnit;
+namespace TheFrosty\Tests\WpUpgradeTaskRunner;
 
 use TheFrosty\WpUpgradeTaskRunner\Upgrade;
 
@@ -28,15 +28,8 @@ class UpgradeTest extends WpUnitTestCase
         parent::setUp();
         $this->upgrade = new Upgrade($this->container);
         $this->upgrade->setPlugin($this->plugin);
-        $GLOBALS['hook_suffix'] = $this->getSettingsPage($this->upgrade);
-        \set_current_screen($this->getSettingsPage($this->upgrade));
-
-        $this->admin_user_id = $this->factory()->user->create([
-            'role' => 'administrator',
-        ]);
-        $this->author_user_id = $this->factory()->user->create([
-            'role' => 'author',
-        ]);
+        $this->admin_user_id = $this->factory()->user->create(['role' => 'administrator']);
+        $this->author_user_id = $this->factory()->user->create(['role' => 'author']);
     }
 
     /**
@@ -45,7 +38,7 @@ class UpgradeTest extends WpUnitTestCase
     public function tearDown(): void
     {
         parent::tearDown();
-        unset($this->upgrade, $GLOBALS['hook_suffix']);
+        unset($this->upgrade);
         \wp_delete_user($this->admin_user_id);
         \wp_delete_user($this->author_user_id);
         \set_current_screen();
@@ -85,13 +78,25 @@ class UpgradeTest extends WpUnitTestCase
     }
 
     /**
+     * Test addHooks().
+     */
+    public function testAddHooks(): void
+    {
+        $this->assertTrue(\method_exists($this->upgrade, 'addHooks'));
+        $provider = $this->getMockProvider(Upgrade::class);
+        $provider->expects($this->exactly(3))
+                 ->method(self::METHOD_ADD_FILTER)
+                 ->willReturn(true);
+        /** @var Upgrade $provider */
+        $provider->addHooks();
+    }
+
+    /**
      * Test addDashboardPage() is available.
      */
     public function testAddDashboardPage(): void
     {
         \wp_set_current_user($this->admin_user_id);
-        $this->upgrade->addHooks();
-        $this->assertTrue(\property_exists($this->upgrade, 'settings_page'));
         $this->assertTrue(\method_exists($this->upgrade, 'addDashboardPage'));
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
@@ -108,8 +113,6 @@ class UpgradeTest extends WpUnitTestCase
     public function testAddDashboardPageWithAdmin(): void
     {
         \wp_set_current_user($this->admin_user_id);
-        $this->upgrade->addHooks();
-        $this->assertTrue(\property_exists($this->upgrade, 'settings_page'));
         $this->assertTrue(\method_exists($this->upgrade, 'addDashboardPage'));
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
@@ -129,8 +132,6 @@ class UpgradeTest extends WpUnitTestCase
     public function testAddDashboardPageWithNonAdmin(): void
     {
         \wp_set_current_user($this->author_user_id);
-        $this->upgrade->addHooks();
-        $this->assertTrue(\property_exists($this->upgrade, 'settings_page'));
         $this->assertTrue(\method_exists($this->upgrade, 'addDashboardPage'));
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
         $addDashboardPage->setAccessible(true);
@@ -151,9 +152,6 @@ class UpgradeTest extends WpUnitTestCase
     public function testEnqueueScripts(): void
     {
         \wp_set_current_user($this->admin_user_id);
-        $this->upgrade->addHooks();
-        $this->assertTrue(\property_exists($this->upgrade, 'settings_page'));
-        $this->assertTrue(\method_exists($this->upgrade, 'addDashboardPage'));
         $this->assertTrue(\method_exists($this->upgrade, 'enqueueScripts'));
 
         $addDashboardPage = $this->getReflection($this->upgrade)->getMethod('addDashboardPage');
@@ -179,9 +177,16 @@ class UpgradeTest extends WpUnitTestCase
         );
     }
 
+    /**
+     * Get the Settings Page string value.
+     * @param Upgrade $upgrade
+     * @return string
+     * @throws \ReflectionException
+     */
     private function getSettingsPage(Upgrade $upgrade): string
     {
         static $value;
+        $this->assertTrue(\property_exists($this->upgrade, 'settings_page'));
 
         if (empty($value)) {
             $settings_page = $this->getReflection($upgrade)->getProperty('settings_page');

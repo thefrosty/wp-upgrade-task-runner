@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace TheFrosty\WpUpgradeTaskRunner\PhpUnit;
+namespace TheFrosty\Tests\WpUpgradeTaskRunner;
 
-use TheFrosty\WpUpgradeTaskRunner\ServiceProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use TheFrosty\WpUtilities\Plugin\Container;
 use TheFrosty\WpUtilities\Plugin\Plugin;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
@@ -15,14 +15,16 @@ use WP_UnitTestCase;
 class WpUnitTestCase extends WP_UnitTestCase
 {
 
-    const METHOD_ADD_ACTION = 'addAction';
-    const METHOD_ADD_FILTER = 'addFilter';
-    const SLUG = 'wp-upgrade-task-runner-test';
+    public const METHOD_ADD_FILTER = 'addFilter';
+
+    /** @var Container $container */
+    protected $container;
 
     /** @var Plugin $plugin */
     protected Plugin $plugin;
-    /** @var Container $container */
-    protected $container;
+
+    /** @var \ReflectionObject $reflection */
+    protected \ReflectionObject $reflection;
 
     /**
      * Set up.
@@ -30,10 +32,10 @@ class WpUnitTestCase extends WP_UnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->plugin = PluginFactory::create(self::SLUG);
-        /** Container object. @var Container $container */
+        // Set the filename to the root of the plugin (not the test plugin (so we have asset access without mocks).
+        $filename = \dirname(__DIR__, 2) . '/upgrade-task-runner.php';
+        $this->plugin = PluginFactory::create('upgrade-task-runner', $filename);
         $this->container = $this->plugin->getContainer();
-        $this->container->register(new ServiceProvider());
     }
 
     /**
@@ -41,8 +43,8 @@ class WpUnitTestCase extends WP_UnitTestCase
      */
     public function tearDown(): void
     {
+        unset($this->container, $this->plugin, $this->reflection);
         parent::tearDown();
-        unset($this->plugin, $this->container);
     }
 
     /**
@@ -54,10 +56,24 @@ class WpUnitTestCase extends WP_UnitTestCase
     {
         static $reflector;
 
-        if (!($reflector instanceof \ReflectionObject)) {
-            $reflector = new \ReflectionObject($argument);
+        if (!isset($reflector[get_class($argument)]) ||
+            !($reflector[get_class($argument)] instanceof \ReflectionObject)
+        ) {
+            $reflector[get_class($argument)] = new \ReflectionObject($argument);
         }
 
-        return $reflector;
+        return $reflector[get_class($argument)];
+    }
+
+    /**
+     * Get a Mock Provider.
+     * @param string $className
+     * @return MockObject
+     */
+    protected function getMockProvider(string $className): MockObject
+    {
+        return $this->getMockBuilder($className)
+                    ->onlyMethods([self::METHOD_ADD_FILTER])
+                    ->getMock();
     }
 }
