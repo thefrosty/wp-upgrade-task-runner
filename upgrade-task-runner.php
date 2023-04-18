@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * A WordPress plugin for developers to write custom migration tasks.
@@ -12,7 +14,6 @@
  * Requires at least: 6.0
  * Tested up to: 6.2.0
  * Requires PHP: 8.0
- * phpcs:disable SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified
  * @package TheFrosty\WpUpgradeTaskRunner
  */
 
@@ -46,10 +47,15 @@ $plugin
         'init',
         10,
         false,
-        [$container])
+        [$container]
+    )
     ->addOnHook(DbUpgrade::class, 'admin_menu', null, true)
     ->addOnHook(TaskCountCheck::class, 'admin_menu', null, true);
 
-add_action('plugins_loaded', static function () use ($plugin): void {
-    $plugin->initialize();
-}, 5);
+add_action(
+    'plugins_loaded',
+    static function () use ($plugin): void {
+        $plugin->initialize();
+    },
+    5
+);
