@@ -18,8 +18,8 @@ jobs:
     strategy:
       matrix:
         operating-system: [ ubuntu-latest ]
-        php-versions: [ 7.4, 8.0, 8.1 ]
-        wp-versions: [ 'latest' ]
+        php-versions: [ '8.0', '8.1' ]
+        wp-versions: [ '6.1', 'latest' ]
         coverage: [ true ]
     services:
       mysql:
@@ -40,7 +40,7 @@ jobs:
       WORDPRESS_DB_USER: wp
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0 # No shallow clone, we need all history!
 
@@ -55,17 +55,6 @@ jobs:
       - name: Setup WordPress ${{ matrix.wp-versions }}
         run: bash bin/install-wp-tests.sh wordpress_test wp password localhost ${{ matrix.wp-versions }} true
 
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: php-${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
-
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction
 
@@ -73,11 +62,13 @@ jobs:
         run: source ./vendor/thefrosty/wp-utilities/bin/create-all-branches.sh
 
       - name: Run composer tests
+        id: tests
         run: composer tests
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
 
       - name: Show PHPCS results in PR
+        if: ${{ always() && steps.tests.outcome == 'failure' }}
         run: cs2pr ./phpcs-report.xml
 
       - name: Upload coverage to Codecov
