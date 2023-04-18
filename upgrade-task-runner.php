@@ -14,7 +14,6 @@ declare(strict_types=1);
  * Requires at least: 6.0
  * Tested up to: 6.2.0
  * Requires PHP: 8.0
- * @package TheFrosty\WpUpgradeTaskRunner
  */
 
 namespace TheFrosty\WpUpgradeTaskRunner;
