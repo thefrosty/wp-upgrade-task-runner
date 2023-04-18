@@ -27,9 +27,11 @@ use TheFrosty\WpUpgradeTaskRunner\Upgrade\TaskCountCheck;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
 use function add_action;
+use function class_exists;
+use function defined;
+use const WP_CLI;
 
 $plugin = PluginFactory::create(SLUG);
-/** Container object. @var \TheFrosty\WpUtilities\Plugin\Container $container */
 $container = $plugin->getContainer();
 $container->register(new ServiceProvider());
 $plugin
@@ -38,7 +40,7 @@ $plugin
     ->add($container[ServiceProvider::TASK_LOADER])
     ->addOnConditionDeferred(
         DispatchTasks::class,
-        fn(): bool => \defined('\WP_CLI') && \WP_CLI && \class_exists('\WP_CLI'),
+        static fn(): bool => defined('\WP_CLI') && WP_CLI && class_exists('\WP_CLI'),
         null,
         'plugins_loaded',
         'init',
