@@ -22,7 +22,7 @@
     },
     "optimize-autoloader": true,
     "platform": {
-      "php": "7.4.26"
+      "php": "8.0"
     },
     "process-timeout": 600,
     "sort-packages": true
@@ -30,21 +30,22 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": "^7.4 || ^8.0",
+    "php": "^8.0",
     "pimple/pimple": "^3.2",
     "symfony/http-foundation": "^5.2 || ~6.0",
-    "thefrosty/wp-utilities": "^2.5.1"
+    "thefrosty/wp-utilities": "^3.0"
   },
   "require-dev": {
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
+    "ext-simplexml": "*",
     "phpcompatibility/php-compatibility": "^9.3",
     "phpunit/phpunit": "^9",
-    "roots/wordpress": "~5.9.1",
-    "slevomat/coding-standard": "^4",
-    "squizlabs/php_codesniffer": "^3.2",
+    "roots/wordpress": "~6.1",
+    "slevomat/coding-standard": "^8.8",
+    "squizlabs/php_codesniffer": "^3.7",
     "wp-cli/wp-cli-bundle": "^2.4",
-    "wp-coding-standards/wpcs": "^2.3",
-    "wp-phpunit/wp-phpunit": "~5.9.1",
+    "wp-coding-standards/wpcs": "dev-develop",
+    "wp-phpunit/wp-phpunit": "~6.1",
     "yoast/phpunit-polyfills": "^1.0.1"
   },
   "autoload": {
@@ -54,7 +55,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "TheFrosty\\WpUpgradeTaskRunner\\PhpUnit\\": "tests/unit"
+      "TheFrosty\\Tests\\WpUpgradeTaskRunner\\": "tests/unit"
     }
   },
   "scripts": {
@@ -65,10 +66,10 @@
       "@install-codestandards"
     ],
     "phpcs": [
-      "bash ./bin/phpcs.sh"
+      "bash ./vendor/thefrosty/wp-utilities/bin/phpcs.sh"
     ],
     "phpunit": [
-      "./vendor/bin/phpunit --colors"
+      "./vendor/bin/phpunit --colors --verbose --coverage-html ./tests/results && php ./tests/clover-results.php ./tests/clover.xml 01"
     ],
     "tests": [
       "@phpcs",
