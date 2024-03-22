@@ -8,18 +8,18 @@ declare(strict_types=1);
  * Plugin Name: Upgrade Task Runner
  * Plugin URI: https://github.com/thefrosty/wp-upgrade-task-runner
  * Description: A WordPress plugin for developers to write custom migration tasks.
- * Version: 2.7.0
+ * Version: 2.8.0
  * Author: Austin Passy
  * Author URI: https://github.com/thefrosty
- * Requires at least: 6.0
- * Tested up to: 6.2.0
- * Requires PHP: 8.0
+ * Requires at least: 6.2
+ * Tested up to: 6.5.0
+ * Requires PHP: 8.1
  */
 
 namespace TheFrosty\WpUpgradeTaskRunner;
 
 const SLUG = 'wp-upgrade-task-runner';
-const VERSION = '2.7.0';
+const VERSION = '2.8.0';
 
 use TheFrosty\WpUpgradeTaskRunner\Cli\DispatchTasks;
 use TheFrosty\WpUpgradeTaskRunner\Upgrade\DbUpgrade;
