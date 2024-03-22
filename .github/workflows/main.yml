@@ -18,8 +18,8 @@ jobs:
     strategy:
       matrix:
         operating-system: [ ubuntu-latest ]
-        php-versions: [ '8.0', '8.1' ]
-        wp-versions: [ '6.3', 'latest' ]
+        php-versions: [ '8.1', '8.2', '8.3' ]
+        wp-versions: [ '6.4', 'latest' ]
         coverage: [ true ]
     services:
       mysql:
@@ -72,6 +72,6 @@ jobs:
         run: cs2pr ./phpcs-report.xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: false
