@@ -22,7 +22,7 @@
     },
     "optimize-autoloader": true,
     "platform": {
-      "php": "8.0"
+      "php": "8.1"
     },
     "process-timeout": 600,
     "sort-packages": true
@@ -30,10 +30,10 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": "^8.0",
-    "pimple/pimple": "^3.2",
-    "symfony/http-foundation": "^5.2 || ~6.0",
-    "thefrosty/wp-utilities": "^3.0"
+    "php": "^8.1",
+    "pimple/pimple": "^3.5",
+    "symfony/http-foundation": "~6.0 || ^7.0",
+    "thefrosty/wp-utilities": "^3.3"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
