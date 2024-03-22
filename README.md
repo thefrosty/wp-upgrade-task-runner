@@ -14,8 +14,8 @@ Register custom migration tasks that can be triggered from a dashboard in the ad
 ### Requirements
 
 ```
-PHP >= 7.4
-WordPress >= 5.4
+PHP >= 8.1
+WordPress >= 6.2
 ```
 
 The required WordPress version will always be the most recent point release of
