@@ -1,10 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TheFrosty\WpUpgradeTaskRunner\Models;
 
 use Countable;
+use DateTime;
+use DateTimeInterface;
 use TheFrosty\WpUpgradeTaskRunner\Api\TaskRunnerInterface;
+use TheFrosty\WpUpgradeTaskRunner\Exceptions\Exception;
 use TheFrosty\WpUtilities\Models\BaseModel;
+use function sprintf;
 
 /**
  * Class UpgradeModel
@@ -30,54 +36,54 @@ class UpgradeModel extends BaseModel implements Countable, UpgradeModelInterface
      * Model count.
      * @var array $model
      */
-    private $model;
+    private array $model;
 
     /**
      * DateTime object of the creation date.
      *
-     * @var \DateTime $date
+     * @var DateTime $date
      */
-    private $date;
+    private DateTime $date;
 
     /**
      * The title of the migration/upgrade.
      *
      * @var string $title
      */
-    private $title;
+    private string $title;
 
     /**
      * The user ID who initiated the task.
      *
      * @var int $user_id
      */
-    private $user_id;
+    private int $user_id;
 
     /**
      * The description of the migration/upgrade.
      *
      * @var string $description
      */
-    private $description;
+    private string $description;
 
     /**
      * The TaskRunnerInterface object.
      *
      * @var TaskRunnerInterface $task_runner
      */
-    private $task_runner;
+    private TaskRunnerInterface $task_runner;
 
     /**
      * UpgradeModel constructor.
      *
      * @param array $fields Incoming fields.
-     * @throws \TheFrosty\WpUpgradeTaskRunner\Exceptions\Exception When the $fields array is missing required fields.
+     * @throws Exception When the $fields array is missing required fields.
      */
     public function __construct(array $fields)
     {
         if (!$this->hasRequiredFields($fields)) {
-            throw new \TheFrosty\WpUpgradeTaskRunner\Exceptions\Exception(
-                \sprintf('Required fields are missing: `%s`', \join(', ', $this->getRequiredFields()))
+            throw new Exception(
+                sprintf('Required fields are missing: `%s`', \join(', ', $this->getRequiredFields()))
             );
         }
 
@@ -95,7 +101,7 @@ class UpgradeModel extends BaseModel implements Countable, UpgradeModelInterface
     }
 
     /**
-     * Wh description of the migration/upgrade.
+     * Set the date/time field.
      *
      * @return array
      */
@@ -104,17 +110,17 @@ class UpgradeModel extends BaseModel implements Countable, UpgradeModelInterface
         return ['date'];
     }
 
-    public function getDate(): \DateTime
-    {
-        return $this->date;
-    }
-
-    public function getDateFormat(string $format = \DATE_ISO8601): string
+    public function getDateFormat(?string $format = DateTimeInterface::ATOM): string
     {
         return $this->date->format($format ?? \get_option('date_format'));
     }
 
-    public function setDate(\DateTime $date): void
+    public function getDate(): DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTime $date): void
     {
         $this->date = $date;
     }
@@ -192,17 +198,13 @@ class UpgradeModel extends BaseModel implements Countable, UpgradeModelInterface
         static $fields;
 
         if (empty($fields)) {
-            try {
-                $constants = (new \ReflectionClass($this))->getConstants();
-                foreach ($constants as $constant => $value) {
-                    if (!\in_array($value, self::REQUIRED_FIELDS, true)) {
-                        continue;
-                    }
-
-                    $fields[] = $value;
+            $constants = (new \ReflectionClass($this))->getConstants();
+            foreach ($constants as $value) {
+                if (!\in_array($value, self::REQUIRED_FIELDS, true)) {
+                    continue;
                 }
-            } catch (\ReflectionException $exception) {
-                $fields = [];
+
+                $fields[] = $value;
             }
         }
 
