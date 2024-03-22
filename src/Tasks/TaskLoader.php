@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TheFrosty\WpUpgradeTaskRunner\Tasks;
 
@@ -26,19 +28,19 @@ class TaskLoader implements \IteratorAggregate, WpHooksInterface
      * Upgrade screen ID.
      * @var string $screen_id
      */
-    private $screen_id;
+    private string $screen_id = '';
 
     /**
      * UpdateModel fields.
      * @var UpgradeModel[] $fields
      */
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * Task Runners.
      * @var TaskRunnerInterface[] $tasks
      */
-    private $tasks = [];
+    private array $tasks = [];
 
     /**
      * Create the actions.

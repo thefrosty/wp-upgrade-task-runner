@@ -1,13 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TheFrosty\WpUpgradeTaskRunner\Api;
 
+use cli\progress\Bar;
+use DateTimeInterface;
 use TheFrosty\WpUpgradeTaskRunner\Models\UpgradeModel;
 use TheFrosty\WpUpgradeTaskRunner\Option;
+use WP_CLI\NoOp;
+use function defined;
+use function function_exists;
+use function WP_CLI\Utils\make_progress_bar;
+use const WP_CLI;
 
 /**
- * Class TaskRunner
- *
+ * Class AbstractTaskRunner
  * @package TheFrosty\WpUpgradeTaskRunner\Api
  * phpcs:disable SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming.SuperfluousPrefix
  */
@@ -83,6 +91,21 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
     }
 
     /**
+     * Create a new CLI Progress Bar.
+     * @param string $message
+     * @param int $count
+     * @return Bar|NoOp|null
+     */
+    protected function makeProgressBar(string $message, int $count): Bar|NoOp|null
+    {
+        $cli = defined('WP_CLI') && WP_CLI;
+        return !$cli || !function_exists('\WP_CLI\Utils\make_progress_bar') ? null : make_progress_bar(
+            $message,
+            $count
+        );
+    }
+
+    /**
      * Get a date formatted string.
      *
      * @return string
@@ -90,9 +113,9 @@ abstract class AbstractTaskRunner implements TaskRunnerInterface
     private function getDate(): string
     {
         try {
-            return (new \DateTime('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC850);
+            return (new \DateTime('now', new \DateTimeZone('UTC')))->format(DateTimeInterface::RFC850);
         } catch (\Throwable $exception) {
-            return \date_create('now', new \DateTimeZone('UTC'))->format(\DateTime::RFC850);
+            return \date_create('now', new \DateTimeZone('UTC'))->format(DateTimeInterface::RFC850);
         }
     }
 }

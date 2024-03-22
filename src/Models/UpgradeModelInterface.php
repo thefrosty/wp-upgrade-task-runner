@@ -1,16 +1,27 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TheFrosty\WpUpgradeTaskRunner\Models;
 
+use DateTimeInterface;
 use TheFrosty\WpUpgradeTaskRunner\Api\TaskRunnerInterface;
 
 /**
  * Interface UpgradeModelInterface
- *
  * @package TheFrosty\WpUpgradeTaskRunner
  */
 interface UpgradeModelInterface
 {
+
+    /**
+     * Returns date formatted according to given format.
+     *
+     * @link http://php.net/manual/en/datetime.format.php
+     * @param string|null $format Defaults to `DateTimeInterface::ATOM`.
+     * @return string
+     */
+    public function getDateFormat(?string $format = DateTimeInterface::ATOM): string;
 
     /**
      * Get the DateTime object of the upgrade date.
@@ -21,16 +32,7 @@ interface UpgradeModelInterface
     public function getDate(): \DateTime;
 
     /**
-     * Returns date formatted according to given format.
-     *
-     * @link http://php.net/manual/en/datetime.format.php
-     * @param string $format Defaults to `DATE_ISO8601`.
-     * @return string
-     */
-    public function getDateFormat(string $format = \DATE_ISO8601): string;
-
-    /**
-     * Sets the the upgrade was created (not run). When passing the value from the array, use a
+     * Sets the date tge upgrade was created (not run). When passing the value from the array, use a
      * string value like `'YYYY-MM-DD'`.
      *
      * @param \DateTime $date Date in the format of a string value that the `AbstractBaseModel` will convert
